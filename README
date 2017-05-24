@@ -1,0 +1,3 @@
+Used
+    ../configure --disable-pulseaudio --disable-esd --disable-video-mir --disable-video-wayland --disable-video-x11 --disable-video-opengl --disable-joystick --disable-haptic --enable static
+for configuring SDL, also uses SDL_image and SDL_mixer
