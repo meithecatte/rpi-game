@@ -1,6 +1,7 @@
-CFLAGS = -O2 -Wall -Wextra -Werror
+CFLAGS = -std=gnu11 `sdl2-config --cflags` -O2 -Wall -Wextra -Werror
+LDFLAGS = `sdl2-config --libs` -lSDL2_image -lSDL2_mixer
 
-OBJS := main
+OBJS := main joypad
 OBJS := $(OBJS:%=build/%.o)
 
 all: rpi-game | dirs
@@ -12,10 +13,10 @@ dirs:
 	@mkdir -p build
 
 rpi-game: $(OBJS) | dirs
-	@gcc -o $@ $< `sdl2-config --libs`
+	@gcc $(LDFLAGS) $(OBJS) -o $@
 	@strip $@
 
-build/%.o: %.c | dirs
-	@gcc $(CFLAGS) `sdl2-config --cflags` -c $< -o $@
+build/%.o: %.c global.h | dirs
+	@gcc $(CFLAGS) -c $< -o $@
 
 .PHONY: all clean dirs
