@@ -3,6 +3,9 @@
 
 #include "global.h"
 
+// power of two recommended for performance - untested
+#define FRAME_VALUES 8
+
 #define IMAGE_LIST \
 	X(gTextureFont, "assets/font.png", KEY_BLACK)				\
 	X(gTextureSplash, "assets/splash.png", KEY_NONE)			\
@@ -17,8 +20,6 @@ SDL_Texture * gScreen = NULL;
 #define X(var,path,key) SDL_Texture * var = NULL;
 IMAGE_LIST
 #undef X
-
-Mix_Chunk * gSoundStartup = NULL;
 
 render_func_t gRenderFunc = NULL;
 render_state_t gRenderState;
@@ -51,18 +52,18 @@ int main(void){
 IMAGE_LIST
 #undef X
 
-	gSoundStartup = Mix_LoadWAV("assets/startup.wav");
-	ERROR_ON_MIX(!gSoundStartup, "startup.wav load");
-
 	for(u8 i = 0;i < GAME_COUNT;i++){
 		gGames[i].menuIcon = loadTexture(gGames[i].menuIconPath, KEY_NONE);
 		if(gGames[i].initFunction) gGames[i].initFunction();
 	}
 
-//	u32 time_now, time_last, fps;
+	u32 mFrameTimes[FRAME_VALUES];
+	u32 mFrameTimeLast, mFrameCount, mCurrentTicks, mDisplayFPS;
+	float mFPS;
 	
-//	time_last = 0;
-//	time_now = SDL_GetTicks();
+	memset(mFrameTimes, 0, sizeof(mFrameTimes));
+	mFrameCount = 0;
+	mFrameTimeLast = SDL_GetTicks();
 
 	while(!gExit){
 		gJoypad = read_joypad();
@@ -72,7 +73,24 @@ IMAGE_LIST
 		gRenderFunc();
 
 		SetFontColor(0x32, 0xCD, 0x32);
-		RenderText(32, 32, "Just testing my font engine...");
+
+		mCurrentTicks = SDL_GetTicks();
+		mFrameTimes[mFrameCount % FRAME_VALUES] = mCurrentTicks - mFrameTimeLast;
+		mFrameTimeLast = mCurrentTicks;
+		mFrameCount++;
+
+		mFPS = 0;
+		for(u8 i = 0;i < FRAME_VALUES;i++){
+			mFPS += mFrameTimes[i];
+		}
+
+		mFPS /= FRAME_VALUES;
+		mFPS = 1000.f / mFPS;
+		mDisplayFPS = floorf(mFPS + 0.5f);
+		if(mDisplayFPS > 99) mDisplayFPS = 99;
+
+		RenderChar(0, 0, (mDisplayFPS / 10) + '0');
+		RenderChar(8, 0, (mDisplayFPS % 10) + '0');
 
 		SDL_SetRenderTarget(gRenderer, NULL);
 		SDL_RenderCopy(gRenderer, gScreen, NULL, NULL);
@@ -101,8 +119,6 @@ void cleanup(void){
 #define X(var,path,key) if(var) SDL_DestroyTexture(var);
 IMAGE_LIST
 #undef X
-
-	if(gSoundStartup)		Mix_FreeChunk(gSoundStartup);
 
 	if(gRenderer)			SDL_DestroyRenderer(gRenderer);
 	if(gWindow)			SDL_DestroyWindow(gWindow);

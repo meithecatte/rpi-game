@@ -1,5 +1,5 @@
 CFLAGS = -std=gnu11 `sdl2-config --cflags` -O2 -Wall -Wextra -Werror
-LDFLAGS = `sdl2-config --libs` -lSDL2_image -lSDL2_mixer
+LDFLAGS = `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm
 
 OBJS := main joypad gamedef
 OBJS := $(OBJS:%=build/%.o)
