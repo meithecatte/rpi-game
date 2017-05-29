@@ -12,6 +12,7 @@ SDL_Surface * loadImage(char * name);
 
 SDL_Window * gWindow = NULL;
 SDL_Renderer * gRenderer = NULL;
+SDL_Texture * gScreen = NULL;
 
 #define X(var,path,key) SDL_Texture * var = NULL;
 IMAGE_LIST
@@ -25,9 +26,9 @@ u16 gJoypad;
 u8 gExit;
 
 int main(void){
-	ERROR_ON_SDL(SDL_Init(SDL_INIT_VIDEO) != 0, "SDL_Init"); atexit(SDL_Quit);
+	ERROR_ON_SDL(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0, "SDL_Init"); atexit(SDL_Quit);
 	ERROR_ON_IMG(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG), "IMG_Init"); atexit(IMG_Quit);
-	ERROR_ON_MIX(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 1, 2048) < 0, "Mix_OpenAudio"); atexit(Mix_Quit);
+	ERROR_ON_MIX(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 1, 1024) < 0, "Mix_OpenAudio"); atexit(Mix_Quit);
 	atexit(cleanup);
 
 	gWindow = SDL_CreateWindow("rpi-game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -37,8 +38,9 @@ int main(void){
 
 	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	ERROR_ON_SDL(!gRenderer, "SDL_CreateRenderer");
-
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+
+	gScreen = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, 320, 240);
 
 	init_joypad();
 	gRenderFunc = Render_SplashScreen;
@@ -65,12 +67,15 @@ IMAGE_LIST
 	while(!gExit){
 		gJoypad = read_joypad();
 
+		SDL_SetRenderTarget(gRenderer, gScreen);
 		SDL_RenderClear(gRenderer);
 		gRenderFunc();
 
 		SetFontColor(0x32, 0xCD, 0x32);
 		RenderText(32, 32, "Just testing my font engine...");
 
+		SDL_SetRenderTarget(gRenderer, NULL);
+		SDL_RenderCopy(gRenderer, gScreen, NULL, NULL);
 		SDL_RenderPresent(gRenderer);
 	}
 
@@ -78,10 +83,6 @@ IMAGE_LIST
 }
 
 void Render_SplashScreen(void){
-	if(gRenderState.splash.frameCounter == 0){
-//		Mix_PlayChannel(-1, gSoundStartup, 0);
-	}
-
 	SDL_RenderCopy(gRenderer, gTextureSplash, NULL, NULL);
 
 	if(gJoypad & JOY_START){
