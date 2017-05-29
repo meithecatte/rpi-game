@@ -66,6 +66,9 @@ typedef struct {
 #define JOY_R 0x001
 
 #define GAME_COUNT 1
+#define FADE_SPEED 16
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
 
 #define IMAGE_LIST \
 	X(gTextureFont, "assets/font.png", KEY_BLACK)				\
@@ -78,10 +81,12 @@ typedef struct {
 void cleanup(void);
 void Render_SplashScreen(void);
 void Render_GameSelectMenu(void);
+void Render_FadeIn(void);
 
 extern SDL_Window * gWindow;
 extern SDL_Renderer * gRenderer;
 extern SDL_Texture * gScreen;
+extern u8 gScreenFade;
 
 #define X(var,path,key) extern SDL_Texture * var;
 IMAGE_LIST
