@@ -10,6 +10,6 @@ game_t gGames[] = {
 		.cleanupFunction = NULL,
 		.menuNameTop = "Ekans",
 		.menuNameBottom = "",
-		.menuIconPath = "assets/snake_menu_logo.png"
+		.menuIconPath = "assets/ekans/menu_logo.png"
 	}
 };
