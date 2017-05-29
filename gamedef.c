@@ -8,6 +8,8 @@ game_t gGames[] = {
 		.renderFunction = NULL,
 		.stopFunction = NULL,
 		.cleanupFunction = NULL,
+		.menuNameTop = "Ekans",
+		.menuNameBottom = "",
 		.menuIconPath = "assets/snake_menu_logo.png"
 	}
 };

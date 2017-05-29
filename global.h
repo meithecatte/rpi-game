@@ -20,7 +20,7 @@ typedef void (*render_func_t)(void);	// every frame while the game is playing
 typedef void (*stop_func_t)(void);	// when the game is closed
 typedef void (*cleanup_func_t)(void);	// at shutdown
 
-typedef enum { GAME_PING, GAME_BREAKIN, GAME_EKANS, GAME_TERTIS } game_index_t;
+typedef enum { GAME_PING, GAME_BREAKOUT, GAME_EKANS, GAME_TERTIS } game_index_t;
 typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
 
 typedef union {
@@ -41,6 +41,8 @@ typedef struct {
 	render_func_t renderFunction;
 	stop_func_t stopFunction;
 	cleanup_func_t cleanupFunction;
+	char * menuNameTop;
+	char * menuNameBottom;
 	char * menuIconPath;
 	SDL_Texture * menuIcon;
 } game_t;
