@@ -1,7 +1,7 @@
 CFLAGS = -std=gnu11 `sdl2-config --cflags` -O2 -Wall -Wextra -Werror
 LDFLAGS = `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm
 
-OBJS := main joypad gamedef
+OBJS := main joypad gamedef helper
 OBJS := $(OBJS:%=build/%.o)
 
 all: rpi-game | dirs

@@ -20,7 +20,7 @@ typedef void (*render_func_t)(void);	// every frame while the game is playing
 typedef void (*stop_func_t)(void);	// when the game is closed
 typedef void (*cleanup_func_t)(void);	// at shutdown
 
-typedef enum { GAME_PING, GAME_BREAKOUT, GAME_EKANS, GAME_TERTIS } game_index_t;
+typedef enum { GAME_EKANS } game_index_t;
 typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
 
 typedef union {
@@ -67,14 +67,25 @@ typedef struct {
 
 #define GAME_COUNT 1
 
+#define IMAGE_LIST \
+	X(gTextureFont, "assets/font.png", KEY_BLACK)				\
+	X(gTextureSplash, "assets/splash.png", KEY_NONE)			\
+	X(gTextureMenuBackground, "assets/menu_background.png", KEY_NONE)
+
 #define SetFontColor(r,g,b) SDL_SetTextureColorMod(gTextureFont, r, g, b);
 
 // main.c
 void cleanup(void);
-SDL_Texture * loadTexture(char * path, color_key_index_t key);
-void RenderChar(int x, int y, char c);
-void RenderText(int x, int y, char * s);
 void Render_SplashScreen(void);
+void Render_GameSelectMenu(void);
+
+extern SDL_Window * gWindow;
+extern SDL_Renderer * gRenderer;
+extern SDL_Texture * gScreen;
+
+#define X(var,path,key) extern SDL_Texture * var;
+IMAGE_LIST
+#undef X
 
 // joypad.c
 void init_joypad(void);
@@ -83,4 +94,8 @@ u16 read_joypad(void);
 // gamedef.c
 extern game_t gGames[GAME_COUNT];
 
+// helper.c
+SDL_Texture * loadTexture(char * path, color_key_index_t key);
+void RenderChar(int x, int y, char c);
+void RenderText(int x, int y, char * s);
 #endif

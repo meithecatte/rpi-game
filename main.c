@@ -6,13 +6,6 @@
 // power of two recommended for performance - untested
 #define FRAME_VALUES 8
 
-#define IMAGE_LIST \
-	X(gTextureFont, "assets/font.png", KEY_BLACK)				\
-	X(gTextureSplash, "assets/splash.png", KEY_NONE)			\
-	X(gTextureMenuBackground, "assets/menu_background.png", KEY_NONE)
-
-SDL_Surface * loadImage(char * name);
-
 SDL_Window * gWindow = NULL;
 SDL_Renderer * gRenderer = NULL;
 SDL_Texture * gScreen = NULL;
@@ -95,6 +88,8 @@ IMAGE_LIST
 		SDL_SetRenderTarget(gRenderer, NULL);
 		SDL_RenderCopy(gRenderer, gScreen, NULL, NULL);
 		SDL_RenderPresent(gRenderer);
+
+		if(gJoypad == (JOY_A | JOY_B | JOY_SELECT | JOY_START)) gExit = 1;
 	}
 
 	return 0;
@@ -103,11 +98,26 @@ IMAGE_LIST
 void Render_SplashScreen(void){
 	SDL_RenderCopy(gRenderer, gTextureSplash, NULL, NULL);
 
-	if(gJoypad & JOY_START){
-		gExit = 1;
-	}
-
 	gRenderState.splash.frameCounter++;
+
+	if(gRenderState.splash.frameCounter >= 180){
+		gRenderFunc = Render_GameSelectMenu;
+		gRenderState.gameSelectMenu.currentGame = 0;
+		gRenderState.gameSelectMenu.scrollOffset = 0;
+	}
+}
+
+void Render_GameSelectMenu(void){
+	SDL_Rect dstrect = { .x = 0, .y = 0, .w = 40, .h = 20 };
+	for(int y = 0;y < 12;y++){
+		for(int x = 0;x < 8;x++){
+			SDL_RenderCopy(gRenderer, gTextureMenuBackground, NULL, &dstrect);
+			dstrect.x += 40;
+		}
+
+		dstrect.y += 20;
+		dstrect.x = 0;
+	}
 }
 
 void cleanup(void){
@@ -122,39 +132,4 @@ IMAGE_LIST
 
 	if(gRenderer)			SDL_DestroyRenderer(gRenderer);
 	if(gWindow)			SDL_DestroyWindow(gWindow);
-}
-
-SDL_Texture * loadTexture(char * path, color_key_index_t key){
-	printf("Loading %s\n", path);
-
-	SDL_Surface * surface = IMG_Load(path);
-	ERROR_ON_IMG(surface == NULL, "IMG_Load");
-
-	switch(key){
-		case KEY_NONE:
-			break;
-		case KEY_BLACK:
-			SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
-			break;
-	}
-
-	SDL_Texture * texture = SDL_CreateTextureFromSurface(gRenderer, surface);
-	ERROR_ON_SDL(texture == NULL, "SDL_CreateTextureFromSurface");
-
-	SDL_FreeSurface(surface);
-
-	return texture;
-}
-
-void RenderChar(int x, int y, char c){
-	SDL_Rect srcrect = { .x = (c % 16) * 8, .y = (c / 16) * 16, .w = 8, .h = 16 };
-	SDL_Rect dstrect = { .x = x, .y = y, .w = 8, .h = 16 };
-	SDL_RenderCopy(gRenderer, gTextureFont, &srcrect, &dstrect);
-}
-
-void RenderText(int x, int y, char * s){
-	while(*s){
-		RenderChar(x, y, *s++);
-		x += 8;
-	}
 }
