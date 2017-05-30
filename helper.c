@@ -1,5 +1,7 @@
 #include "global.h"
 
+render_func_t gRenderFuncAfterFade = NULL;
+
 SDL_Texture * loadTexture(char * path, color_key_index_t key){
 	printf("Loading %s\n", path);
 
@@ -33,4 +35,15 @@ void RenderText(int x, int y, char * s){
 		RenderChar(x, y, *s++);
 		x += 8;
 	}
+}
+
+void Render_FadeIn(void){
+	if(gScreenFade < 255 - FADE_SPEED) gScreenFade += FADE_SPEED;
+	else if(gScreenFade != 255) gScreenFade = 255;
+
+	if(gScreenFade == 255){
+		gRenderFunc = gRenderFuncAfterFade;
+	}
+
+	gRenderFuncAfterFade();
 }

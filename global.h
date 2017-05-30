@@ -7,6 +7,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
+#include "ekans.h"
+
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -20,7 +22,7 @@ typedef void (*render_func_t)(void);	// every frame while the game is playing
 typedef void (*stop_func_t)(void);	// when the game is closed
 typedef void (*cleanup_func_t)(void);	// at shutdown
 
-typedef enum { GAME_EKANS } game_index_t;
+typedef enum { GAME_EKANS = 0, GAME_NONE } game_index_t;
 typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
 
 typedef union {
@@ -31,7 +33,22 @@ typedef union {
 	struct {
 		u16 scrollOffset;
 		game_index_t currentGame;
+		game_index_t fireUp;
 	} gameSelectMenu;
+
+	struct {
+		Ekans_Segment * head;
+		Ekans_Segment * tail;
+		int score;
+		u8 framesPerUpdate;
+		u8 framesSinceLastUpdate;
+		ekans_difficulty_t difficulty;
+		ekans_state_t state;
+		ekans_direction_t direction;
+		u16 fruitX;
+		u16 fruitY;
+		Ekans_ScoresTableEntry highScoreTable[4][10]; // per difficulty, [diff][index]
+	} ekans;
 } render_state_t;
 
 typedef struct {
@@ -51,6 +68,7 @@ typedef struct {
 #define ERROR_ON_IMG(cond,mesg) if(cond){fprintf(stderr,mesg " error: %s\n", IMG_GetError());exit(1);}
 #define ERROR_ON_MIX(cond,mesg) if(cond){fprintf(stderr,mesg " error: %s\n", Mix_GetError());exit(1);}
 #define ERROR_ON_SYS(cond,mesg) if(cond){fprintf(stderr,mesg " error (%d): %s\n", errno, strerror(errno));exit(1);}
+#define CALL_UNLESS_NULL(func) if(func) func()
 
 #define JOY_SELECT 0x200
 #define JOY_START 0x100
@@ -79,14 +97,17 @@ typedef struct {
 
 // main.c
 void cleanup(void);
+void Render_DoFPS(void);
 void Render_SplashScreen(void);
+void Render_GameSelectMenu_RenderGame(game_t * game, int dx);
 void Render_GameSelectMenu(void);
-void Render_FadeIn(void);
 
 extern SDL_Window * gWindow;
 extern SDL_Renderer * gRenderer;
 extern SDL_Texture * gScreen;
 extern u8 gScreenFade;
+extern render_func_t gRenderFunc;
+extern render_state_t gRenderState;
 
 #define X(var,path,key) extern SDL_Texture * var;
 IMAGE_LIST
@@ -103,4 +124,7 @@ extern game_t gGames[GAME_COUNT];
 SDL_Texture * loadTexture(char * path, color_key_index_t key);
 void RenderChar(int x, int y, char c);
 void RenderText(int x, int y, char * s);
+void Render_FadeIn(void);
+
+extern render_func_t gRenderFuncAfterFade;
 #endif
