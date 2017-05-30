@@ -38,9 +38,10 @@ int main(void){
 	ERROR_ON_SDL(!gRenderer, "SDL_CreateRenderer");
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 
-	gScreen = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+	gScreen = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_ABGR8888,
+		SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	init_joypad();
+	InitJoypad();
 	gRenderFunc = Render_SplashScreen;
 	gRenderState.splash.frameCounter = 0;
 	gExit = 0;
@@ -60,7 +61,7 @@ IMAGE_LIST
 	gFrameTimeLast = SDL_GetTicks();
 
 	while(!gExit){
-		gJoypad = read_joypad();
+		gJoypad = ReadJoypad();
 
 		SDL_SetRenderTarget(gRenderer, gScreen);
 		SDL_RenderClear(gRenderer);
@@ -139,7 +140,8 @@ void Render_GameSelectMenu(void){
 
 		if(gScreenFade == 0){
 			CALL_UNLESS_NULL(gGames[gRenderState.gameSelectMenu.currentGame].startFunction);
-			gRenderFunc = gGames[0].renderFunction;
+			gRenderFunc = Render_FadeIn;
+			gRenderFuncAfterFade = gGames[0].renderFunction;
 		}
 	}
 

@@ -114,8 +114,8 @@ IMAGE_LIST
 #undef X
 
 // joypad.c
-void init_joypad(void);
-u16 read_joypad(void);
+void InitJoypad(void);
+u16 ReadJoypad(void);
 
 // gamedef.c
 extern game_t gGames[GAME_COUNT];

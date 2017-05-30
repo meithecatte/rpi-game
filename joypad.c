@@ -18,7 +18,7 @@
 
 volatile u32 * gGPIO;
 
-void init_joypad(void){
+void InitJoypad(void){
 	int mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
 
 	ERROR_ON_SYS(mem_fd < 0, "GPIO open");
@@ -37,7 +37,7 @@ void init_joypad(void){
 	GPIO_HI(GPIO_JOY_CLOCK);
 }
 
-u16 read_joypad(void){
+u16 ReadJoypad(void){
 	u16 readout = 0;
 
 	GPIO_HI(GPIO_JOY_LATCH); usleep(15);
