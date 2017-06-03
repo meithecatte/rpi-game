@@ -65,7 +65,9 @@ IMAGE_LIST
 
 		SDL_SetRenderTarget(gRenderer, gScreen);
 		SDL_RenderClear(gRenderer);
+
 		gRenderFunc();
+
 		SDL_SetRenderTarget(gRenderer, NULL);
 		SDL_SetTextureColorMod(gScreen, gScreenFade, gScreenFade, gScreenFade);
 		SDL_RenderCopy(gRenderer, gScreen, NULL, NULL);
@@ -124,7 +126,7 @@ void Render_SplashScreen(void){
 	}
 }
 
-void Render_GameSelectMenu_RenderGame(game_t * game, int dx){
+void Render_GameSelectMenu_RenderGame(const game_t * game, int dx){
 	SDL_Rect dstrect = { .x = 112 + dx, .y = 64, .w = 96, .h = 96 };
 	SDL_RenderCopy(gRenderer, game->menuIcon, NULL, &dstrect);
 

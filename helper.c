@@ -2,7 +2,7 @@
 
 render_func_t gRenderFuncAfterFade = NULL;
 
-SDL_Texture * loadTexture(char * path, color_key_index_t key){
+SDL_Texture * loadTexture(const char * path, color_key_index_t key){
 	printf("Loading %s\n", path);
 
 	SDL_Surface * surface = IMG_Load(path);
@@ -30,7 +30,7 @@ void RenderChar(int x, int y, char c){
 	SDL_RenderCopy(gRenderer, gTextureFont, &srcrect, &dstrect);
 }
 
-void RenderText(int x, int y, char * s){
+void RenderText(int x, int y, const char * s){
 	while(*s){
 		RenderChar(x, y, *s++);
 		x += 8;

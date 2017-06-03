@@ -99,7 +99,7 @@ typedef struct {
 void cleanup(void);
 void Render_DoFPS(void);
 void Render_SplashScreen(void);
-void Render_GameSelectMenu_RenderGame(game_t * game, int dx);
+void Render_GameSelectMenu_RenderGame(const game_t * game, int dx);
 void Render_GameSelectMenu(void);
 
 extern SDL_Window * gWindow;
@@ -121,9 +121,9 @@ u16 ReadJoypad(void);
 extern game_t gGames[GAME_COUNT];
 
 // helper.c
-SDL_Texture * loadTexture(char * path, color_key_index_t key);
+SDL_Texture * loadTexture(const char * path, color_key_index_t key);
 void RenderChar(int x, int y, char c);
-void RenderText(int x, int y, char * s);
+void RenderText(int x, int y, const char * s);
 void Render_FadeIn(void);
 
 extern render_func_t gRenderFuncAfterFade;
