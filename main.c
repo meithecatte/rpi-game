@@ -86,7 +86,7 @@ void Render_DoFPS(void){
 	u32 mCurrentTicks, mDisplayFPS;
 	float mFPS;
 	
-	SetFontColor(0x32, 0xCD, 0x32);
+	SetFontColor16(0x32, 0xCD, 0x32);
 
 	mCurrentTicks = SDL_GetTicks();
 	gFrameTimes[gFrameCount % FRAME_VALUES] = mCurrentTicks - gFrameTimeLast;
@@ -103,8 +103,8 @@ void Render_DoFPS(void){
 	mDisplayFPS = floorf(mFPS + 0.5f);
 	if(mDisplayFPS > 99) mDisplayFPS = 99;
 
-	RenderChar(0, 0, (mDisplayFPS / 10) + '0');
-	RenderChar(8, 0, (mDisplayFPS % 10) + '0');
+	RenderChar16(0, 0, (mDisplayFPS / 10) + '0');
+	RenderChar16(8, 0, (mDisplayFPS % 10) + '0');
 }
 
 void Render_SplashScreen(void){
@@ -130,9 +130,9 @@ void Render_GameSelectMenu_RenderGame(const game_t * game, int dx){
 	SDL_Rect dstrect = { .x = 112 + dx, .y = 64, .w = 96, .h = 96 };
 	SDL_RenderCopy(gRenderer, game->menuIcon, NULL, &dstrect);
 
-	SetFontColor(0, 0, 0);
-	RenderText((SCREEN_WIDTH - strlen(game->menuNameTop) * 8) / 2, 164 + dx, game->menuNameTop);
-	RenderText((SCREEN_WIDTH - strlen(game->menuNameBottom) * 8) / 2, 180 + dx, game->menuNameBottom);
+	SetFontColor16(0, 0, 0);
+	RenderText16((SCREEN_WIDTH - strlen(game->menuNameTop) * 8) / 2, 164 + dx, game->menuNameTop);
+	RenderText16((SCREEN_WIDTH - strlen(game->menuNameBottom) * 8) / 2, 180 + dx, game->menuNameBottom);
 }
 
 void Render_GameSelectMenu(void){

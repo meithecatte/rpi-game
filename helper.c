@@ -24,15 +24,15 @@ SDL_Texture * loadTexture(const char * path, color_key_index_t key){
 	return texture;
 }
 
-void RenderChar(int x, int y, char c){
-	SDL_Rect srcrect = { .x = (c % 16) * 8, .y = (c / 16) * 16, .w = 8, .h = 16 };
-	SDL_Rect dstrect = { .x = x, .y = y, .w = 8, .h = 16 };
-	SDL_RenderCopy(gRenderer, gTextureFont, &srcrect, &dstrect);
+void RenderChar(int x, int y, char c, int height){
+	SDL_Rect srcrect = { .x = (c % 16) * 8, .y = (c / 16) * height, .w = 8, .h = height };
+	SDL_Rect dstrect = { .x = x, .y = y, .w = 8, .h = height };
+	SDL_RenderCopy(gRenderer, (height == 8) ? gTextureFont8 : gTextureFont16, &srcrect, &dstrect);
 }
 
-void RenderText(int x, int y, const char * s){
+void RenderText(int x, int y, const char * s, int height){
 	while(*s){
-		RenderChar(x, y, *s++);
+		RenderChar(x, y, *s++, height);
 		x += 8;
 	}
 }

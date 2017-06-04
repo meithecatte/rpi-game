@@ -89,11 +89,10 @@ typedef struct {
 #define SCREEN_HEIGHT 240
 
 #define IMAGE_LIST \
-	X(gTextureFont, "assets/font.png", KEY_BLACK)				\
+	X(gTextureFont8, "assets/font8.png", KEY_BLACK)				\
+	X(gTextureFont16, "assets/font16.png", KEY_BLACK)			\
 	X(gTextureSplash, "assets/splash.png", KEY_NONE)			\
 	X(gTextureMenuBackground, "assets/menu_background.png", KEY_NONE)
-
-#define SetFontColor(r,g,b) SDL_SetTextureColorMod(gTextureFont, r, g, b);
 
 // main.c
 void cleanup(void);
@@ -121,9 +120,18 @@ u16 ReadJoypad(void);
 extern game_t gGames[GAME_COUNT];
 
 // helper.c
+#define RenderChar8(x,y,c) RenderChar(x,y,c,8)
+#define RenderChar16(x,y,c) RenderChar(x,y,c,16)
+
+#define RenderText8(x,y,s) RenderText(x,y,s,8)
+#define RenderText16(x,y,s) RenderText(x,y,s,16)
+
+#define SetFontColor8(r,g,b) SDL_SetTextureColorMod(gTextureFont8, r, g, b);
+#define SetFontColor16(r,g,b) SDL_SetTextureColorMod(gTextureFont16, r, g, b);
+
 SDL_Texture * loadTexture(const char * path, color_key_index_t key);
-void RenderChar(int x, int y, char c);
-void RenderText(int x, int y, const char * s);
+void RenderChar(int x, int y, char c, int height);
+void RenderText(int x, int y, const char * s, int height);
 void Render_FadeIn(void);
 
 extern render_func_t gRenderFuncAfterFade;

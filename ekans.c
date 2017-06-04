@@ -34,11 +34,11 @@ void Ekans_RenderFunction(void){
 			dstrect.h = 96;
 			SDL_RenderCopy(gRenderer, gGames[GAME_EKANS].menuIcon, NULL, &dstrect);
 
-			SetFontColor(0, 0, 0);
-			RenderText((320 - 64) / 2, 100, "New Game");
-			RenderText((320 - 80) / 2, 116, gEkansDifficultyStrings[gRenderState.ekans.difficulty]);
-			RenderText((320 - 88) / 2, 132, "High Scores");
-			RenderText((320 - 32) / 2, 148, "Exit");
+			SetFontColor8(0, 0, 0);
+			RenderText8((320 - 64) / 2, 100, "New Game");
+			RenderText8((320 - 80) / 2, 116, gEkansDifficultyStrings[gRenderState.ekans.difficulty]);
+			RenderText8((320 - 88) / 2, 132, "High Scores");
+			RenderText8((320 - 32) / 2, 148, "Exit");
 			break;
 		default:
 			break;
