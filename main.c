@@ -109,7 +109,6 @@ void Render_DoFPS(void){
 }
 
 void Render_SplashScreen(void){
-	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, gTextureSplash, NULL, NULL);
 
 	gRenderState.splash.frameCounter++;
@@ -133,7 +132,6 @@ void Render_GameSelectMenu_RenderGame(const game_t * game, int dx){
 }
 
 void Render_GameSelectMenu(void){
-	SDL_RenderClear(gRenderer);
 	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE){
 		CALL_UNLESS_NULL(gGames[gRenderState.gameSelectMenu.currentGame].startFunction);
 		gRenderFunc = Render_FadeTransition;
@@ -154,7 +152,7 @@ void Render_GameSelectMenu(void){
 	// XXX: Make this support more than one game when needed
 	Render_GameSelectMenu_RenderGame(&gGames[0], 0);
 
-	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE || (gScreenFade != 255)) return;
+	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE || !gScreenFade) return;
 
 	if(gJoypadPressed & (JOY_START | JOY_A)){
 		gRenderState.gameSelectMenu.fireUp = gRenderState.gameSelectMenu.currentGame;

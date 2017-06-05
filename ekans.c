@@ -42,7 +42,7 @@ void Ekans_RenderFunction(void){
 			RenderText8(124, 112, "High Scores");
 			RenderText8(124, 124, "Exit");
 
-			if(gScreenFade != 255) break;
+			if(!gScreenFade) return; // rendering for fade, ignore inputs
 
 			if(gRenderState.ekans.menuCursorLocation > 0 && gJoypadPressed & JOY_UP){
 				gRenderState.ekans.menuCursorLocation--;
@@ -51,7 +51,11 @@ void Ekans_RenderFunction(void){
 			}else if(gJoypadPressed & (JOY_START | JOY_A)){
 				switch(gRenderState.ekans.menuCursorLocation){
 					case 2:
-						;
+						gRenderState.gameSelectMenu.scrollOffset = 0;
+						gRenderState.gameSelectMenu.currentGame = GAME_EKANS;
+						gRenderState.gameSelectMenu.fireUp = GAME_NONE;
+						gRenderFunc = Render_FadeTransition;
+						gRenderFuncAfterFade = Render_GameSelectMenu;
 						break;
 				}
 			}
