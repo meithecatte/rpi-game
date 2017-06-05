@@ -40,6 +40,7 @@ typedef union {
 		Ekans_Segment * head;
 		Ekans_Segment * tail;
 		int score;
+		int menuCursorLocation;
 		u8 framesPerUpdate;
 		u8 framesSinceLastUpdate;
 		ekans_difficulty_t difficulty;
@@ -84,7 +85,6 @@ typedef struct {
 #define JOY_R 0x001
 
 #define GAME_COUNT 1
-#define FADE_SPEED 16
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
@@ -107,6 +107,7 @@ extern SDL_Texture * gScreen;
 extern u8 gScreenFade;
 extern render_func_t gRenderFunc;
 extern render_state_t gRenderState;
+extern u16 gJoypadHeld, gJoypadPressed;
 
 #define X(var,path,key) extern SDL_Texture * var;
 IMAGE_LIST
@@ -133,6 +134,7 @@ SDL_Texture * loadTexture(const char * path, color_key_index_t key);
 void RenderChar(int x, int y, char c, int height);
 void RenderText(int x, int y, const char * s, int height);
 void Render_FadeIn(void);
+void Render_FadeTransition(void);
 
 extern render_func_t gRenderFuncAfterFade;
 #endif

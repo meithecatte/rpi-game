@@ -1,4 +1,5 @@
 #include "global.h"
+#define FADE_SPEED 16
 
 render_func_t gRenderFuncAfterFade = NULL;
 
@@ -39,11 +40,21 @@ void RenderText(int x, int y, const char * s, int height){
 
 void Render_FadeIn(void){
 	if(gScreenFade < 255 - FADE_SPEED) gScreenFade += FADE_SPEED;
-	else if(gScreenFade != 255) gScreenFade = 255;
+	else gScreenFade = 255;
 
 	if(gScreenFade == 255){
 		gRenderFunc = gRenderFuncAfterFade;
 	}
 
 	gRenderFuncAfterFade();
+}
+
+void Render_FadeTransition(void){
+	if(gScreenFade > FADE_SPEED) gScreenFade -= FADE_SPEED;
+	else gScreenFade = 0;
+
+	if(gScreenFade == 0){
+		gRenderFunc = Render_FadeIn;
+		gRenderFuncAfterFade();
+	}
 }

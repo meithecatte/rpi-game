@@ -16,7 +16,7 @@ IMAGE_LIST
 
 render_func_t gRenderFunc = NULL;
 render_state_t gRenderState;
-u16 gJoypad;
+u16 gJoypadHeld, gJoypadPressed;
 u8 gExit;
 u8 gScreenFade = 255;
 
@@ -61,10 +61,11 @@ IMAGE_LIST
 	gFrameTimeLast = SDL_GetTicks();
 
 	while(!gExit){
-		gJoypad = ReadJoypad();
+		u16 oldJoypad = gJoypadHeld;
+		gJoypadHeld = ReadJoypad();
+		gJoypadPressed = gJoypadHeld & ~oldJoypad;
 
 		SDL_SetRenderTarget(gRenderer, gScreen);
-		SDL_RenderClear(gRenderer);
 
 		gRenderFunc();
 
@@ -76,7 +77,7 @@ IMAGE_LIST
 
 		SDL_RenderPresent(gRenderer);
 
-		if(gJoypad == (JOY_L | JOY_R | JOY_SELECT | JOY_START)) gExit = 1;
+		if(gJoypadHeld == (JOY_L | JOY_R | JOY_SELECT | JOY_START)) gExit = 1;
 	}
 
 	return 0;
@@ -108,21 +109,17 @@ void Render_DoFPS(void){
 }
 
 void Render_SplashScreen(void){
+	SDL_RenderClear(gRenderer);
 	SDL_RenderCopy(gRenderer, gTextureSplash, NULL, NULL);
 
 	gRenderState.splash.frameCounter++;
 
 	if(gRenderState.splash.frameCounter >= 120){
-		if(gScreenFade > FADE_SPEED) gScreenFade -= FADE_SPEED;
-		else if(gScreenFade != 0) gScreenFade = 0;
-
-		if(gScreenFade == 0){
-			gRenderFunc = Render_FadeIn;
-			gRenderFuncAfterFade = Render_GameSelectMenu;
-			gRenderState.gameSelectMenu.currentGame = GAME_EKANS;
-			gRenderState.gameSelectMenu.scrollOffset = 0;
-			gRenderState.gameSelectMenu.fireUp = GAME_NONE;
-		}
+		gRenderFunc = Render_FadeTransition;
+		gRenderFuncAfterFade = Render_GameSelectMenu;
+		gRenderState.gameSelectMenu.currentGame = GAME_EKANS;
+		gRenderState.gameSelectMenu.scrollOffset = 0;
+		gRenderState.gameSelectMenu.fireUp = GAME_NONE;
 	}
 }
 
@@ -136,15 +133,11 @@ void Render_GameSelectMenu_RenderGame(const game_t * game, int dx){
 }
 
 void Render_GameSelectMenu(void){
+	SDL_RenderClear(gRenderer);
 	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE){
-		if(gScreenFade > FADE_SPEED) gScreenFade -= FADE_SPEED;
-		else if(gScreenFade != 0) gScreenFade = 0;
-
-		if(gScreenFade == 0){
-			CALL_UNLESS_NULL(gGames[gRenderState.gameSelectMenu.currentGame].startFunction);
-			gRenderFunc = Render_FadeIn;
-			gRenderFuncAfterFade = gGames[0].renderFunction;
-		}
+		CALL_UNLESS_NULL(gGames[gRenderState.gameSelectMenu.currentGame].startFunction);
+		gRenderFunc = Render_FadeTransition;
+		gRenderFuncAfterFade = gGames[0].renderFunction;
 	}
 
 	SDL_Rect dstrect = { .x = 0, .y = 0, .w = 40, .h = 20 };
@@ -163,7 +156,7 @@ void Render_GameSelectMenu(void){
 
 	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE || (gScreenFade != 255)) return;
 
-	if(gJoypad & (JOY_START | JOY_A)){
+	if(gJoypadPressed & (JOY_START | JOY_A)){
 		gRenderState.gameSelectMenu.fireUp = gRenderState.gameSelectMenu.currentGame;
 	}
 }

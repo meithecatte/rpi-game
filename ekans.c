@@ -9,10 +9,10 @@ const ekans_direction_t gEkansOppositeDirection[] = {
 };
 
 const char * gEkansDifficultyStrings[] = {
-	[SLOW] =	"   Slow >",
-	[NORMAL] =	"< Normal >",
-	[FAST] =	" < Fast >",
-	[INSANE] =	"< Insane",
+	[SLOW] =	"Slow",
+	[NORMAL] =	"Normal",
+	[FAST] =	"Fast",
+	[INSANE] =	"Insane",
 };
 
 void Ekans_StartFunction(void){
@@ -21,10 +21,12 @@ void Ekans_StartFunction(void){
 	gRenderState.ekans.state = MAIN_MENU;
 	gRenderState.ekans.head = NULL;
 	gRenderState.ekans.tail = NULL;
+	gRenderState.ekans.menuCursorLocation = 0;
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
 }
 
 void Ekans_RenderFunction(void){
+	SDL_RenderClear(gRenderer);
 	SDL_Rect dstrect;
 	switch(gRenderState.ekans.state){
 		case MAIN_MENU:
@@ -35,10 +37,25 @@ void Ekans_RenderFunction(void){
 			SDL_RenderCopy(gRenderer, gGames[GAME_EKANS].menuIcon, NULL, &dstrect);
 
 			SetFontColor8(0, 0, 0);
-			RenderText8((320 - 64) / 2, 100, "New Game");
-			RenderText8((320 - 80) / 2, 116, gEkansDifficultyStrings[gRenderState.ekans.difficulty]);
-			RenderText8((320 - 88) / 2, 132, "High Scores");
-			RenderText8((320 - 32) / 2, 148, "Exit");
+			RenderChar8(116, 100 + 12 * gRenderState.ekans.menuCursorLocation, 0x01);
+			RenderText8(124, 100, "New Game");
+			RenderText8(124, 112, "High Scores");
+			RenderText8(124, 124, "Exit");
+
+			if(gScreenFade != 255) break;
+
+			if(gRenderState.ekans.menuCursorLocation > 0 && gJoypadPressed & JOY_UP){
+				gRenderState.ekans.menuCursorLocation--;
+			}else if(gRenderState.ekans.menuCursorLocation < 2 && gJoypadPressed & JOY_DOWN){
+				gRenderState.ekans.menuCursorLocation++;
+			}else if(gJoypadPressed & (JOY_START | JOY_A)){
+				switch(gRenderState.ekans.menuCursorLocation){
+					case 2:
+						;
+						break;
+				}
+			}
+
 			break;
 		default:
 			break;
