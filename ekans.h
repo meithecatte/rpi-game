@@ -10,6 +10,7 @@ extern const ekans_direction_t gEkansOppositeDirection[];
 typedef struct __Ekans_Segment {
 	struct __Ekans_Segment * prev; // NULL if head
 	struct __Ekans_Segment * next; // NULL if tail
+	u16 x, y;
 } Ekans_Segment;
 
 typedef struct {
