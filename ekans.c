@@ -9,9 +9,9 @@ const ekans_direction_t gEkansOppositeDirection[] = {
 };
 
 const char * gEkansDifficultyStrings[] = {
-	[SLOW] =	"Slow",
+	[SLOW] =	" Slow",
 	[NORMAL] =	"Normal",
-	[FAST] =	"Fast",
+	[FAST] =	" Fast",
 	[INSANE] =	"Insane",
 };
 
@@ -44,12 +44,20 @@ void Ekans_RenderFunction(void){
 
 			if(!gScreenFade) return; // rendering for fade, ignore inputs
 
-			if(gRenderState.ekans.menuCursorLocation > 0 && gJoypadPressed & JOY_UP){
+			if(gJoypadPressed & JOY_UP){
 				gRenderState.ekans.menuCursorLocation--;
-			}else if(gRenderState.ekans.menuCursorLocation < 2 && gJoypadPressed & JOY_DOWN){
+
+				if(gRenderState.ekans.menuCursorLocation < 0){
+					gRenderState.ekans.menuCursorLocation += 3;
+				}
+			}else if(gJoypadPressed & JOY_DOWN){
 				gRenderState.ekans.menuCursorLocation++;
+				gRenderState.ekans.menuCursorLocation %= 3;
 			}else if(gJoypadPressed & (JOY_START | JOY_A)){
 				switch(gRenderState.ekans.menuCursorLocation){
+					case 0:
+						gRenderState.ekans.state = DIFFICULTY;
+						break;
 					case 2:
 						gRenderState.gameSelectMenu.scrollOffset = 0;
 						gRenderState.gameSelectMenu.currentGame = GAME_EKANS;
@@ -61,6 +69,35 @@ void Ekans_RenderFunction(void){
 			}
 
 			break;
+		case DIFFICULTY:
+			dstrect.x = 112; // draw logo
+			dstrect.y = 0;
+			dstrect.w = 96;
+			dstrect.h = 96;
+			SDL_RenderCopy(gRenderer, gGames[GAME_EKANS].menuIcon, NULL, &dstrect);
+
+			SetFontColor8(0, 0, 0);
+			RenderChar8(112, 112 + 12 * gRenderState.ekans.difficulty, 0x06);
+			RenderChar8(176, 112 + 12 * gRenderState.ekans.difficulty, 0x05);
+			RenderText8(80, 92, "Difficulty Select");
+			for(u8 i = 0;i < LENGTH(gEkansDifficultyStrings);i++){
+				RenderText8(124, 112 + i * 12, gEkansDifficultyStrings[i]);
+			}
+
+			if(gJoypadPressed & JOY_UP){
+				if(gRenderState.ekans.difficulty == 0){
+					gRenderState.ekans.difficulty += 4;
+				}
+
+				gRenderState.ekans.difficulty--;
+			}else if(gJoypadPressed & JOY_DOWN){
+				gRenderState.ekans.difficulty++;
+				gRenderState.ekans.difficulty %= 4;
+			}else if(gJoypadPressed & JOY_A){
+				gRenderState.ekans.state = PLAYING;
+			}else if(gJoypadPressed & JOY_B){
+				gRenderState.ekans.state = MAIN_MENU;
+			}
 		default:
 			break;
 	}

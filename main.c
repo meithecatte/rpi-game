@@ -42,6 +42,7 @@ int main(void){
 		SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	InitJoypad();
+	InitRandom();
 	gRenderFunc = Render_SplashScreen;
 	gRenderState.splash.frameCounter = 0;
 	gExit = 0;
@@ -157,6 +158,15 @@ void Render_GameSelectMenu(void){
 	if(gJoypadPressed & (JOY_START | JOY_A)){
 		gRenderState.gameSelectMenu.fireUp = gRenderState.gameSelectMenu.currentGame;
 	}
+}
+
+void InitRandom(void){
+	u32 seed;
+	int fd = open("/dev/hwrng", O_RD);
+	ERROR_ON_SYS(fd < 0);
+	ERROR_ON_SYS(read(fd, &seed, 4) != 4);
+	close(fd);
+	srand(seed);
 }
 
 void cleanup(void){

@@ -2,7 +2,7 @@
 #define _EKANS_H
 
 typedef enum { SLOW, NORMAL, FAST, INSANE } ekans_difficulty_t;
-typedef enum { MAIN_MENU, PLAYING, PAUSED, HIGHSCORES, SAVE_HIGHSCORE } ekans_state_t;
+typedef enum { MAIN_MENU, DIFFICULTY, PLAYING, PAUSED, HIGHSCORES, SAVE_HIGHSCORE } ekans_state_t;
 typedef enum { UP, DOWN, LEFT, RIGHT } ekans_direction_t;
 
 extern const ekans_direction_t gEkansOppositeDirection[];

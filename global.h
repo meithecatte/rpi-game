@@ -70,6 +70,7 @@ typedef struct {
 #define ERROR_ON_MIX(cond,mesg) if(cond){fprintf(stderr,mesg " error: %s\n", Mix_GetError());exit(1);}
 #define ERROR_ON_SYS(cond,mesg) if(cond){fprintf(stderr,mesg " error (%d): %s\n", errno, strerror(errno));exit(1);}
 #define CALL_UNLESS_NULL(func) if(func) func()
+#define LENGTH(arr) (sizeof((arr))/sizeof((arr)[0]))
 
 #define JOY_SELECT 0x200
 #define JOY_START 0x100
