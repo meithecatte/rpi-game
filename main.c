@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "global.h"
 
@@ -15,7 +16,6 @@ IMAGE_LIST
 #undef X
 
 render_func_t gRenderFunc = NULL;
-render_state_t gRenderState;
 u16 gJoypadHeld, gJoypadPressed;
 u8 gExit;
 u8 gScreenFade = 255;
@@ -41,12 +41,6 @@ int main(void){
 	gScreen = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_ABGR8888,
 		SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	InitJoypad();
-	InitRandom();
-	gRenderFunc = Render_SplashScreen;
-	gRenderState.splash.frameCounter = 0;
-	gExit = 0;
-
 #define X(var,path,key) var = loadTexture(path,key);
 IMAGE_LIST
 #undef X
@@ -56,6 +50,12 @@ IMAGE_LIST
 
 		CALL_UNLESS_NULL(gGames[i].initFunction);
 	}
+
+	InitJoypad();
+	InitRandom();
+
+	gRenderFunc = Render_SplashScreen;
+	gExit = 0;
 
 	memset(gFrameTimes, 0, sizeof(gFrameTimes));
 	gFrameCount = 0;
@@ -110,16 +110,14 @@ void Render_DoFPS(void){
 }
 
 void Render_SplashScreen(void){
+	static int frameCounter;
 	SDL_RenderCopy(gRenderer, gTextureSplash, NULL, NULL);
 
-	gRenderState.splash.frameCounter++;
+	frameCounter++;
 
-	if(gRenderState.splash.frameCounter >= 120){
+	if(frameCounter >= 60){
 		gRenderFunc = Render_FadeTransition;
 		gRenderFuncAfterFade = Render_GameSelectMenu;
-		gRenderState.gameSelectMenu.currentGame = GAME_EKANS;
-		gRenderState.gameSelectMenu.scrollOffset = 0;
-		gRenderState.gameSelectMenu.fireUp = GAME_NONE;
 	}
 }
 
@@ -133,12 +131,7 @@ void Render_GameSelectMenu_RenderGame(const game_t * game, int dx){
 }
 
 void Render_GameSelectMenu(void){
-	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE){
-		CALL_UNLESS_NULL(gGames[gRenderState.gameSelectMenu.currentGame].startFunction);
-		gRenderFunc = Render_FadeTransition;
-		gRenderFuncAfterFade = gGames[0].renderFunction;
-	}
-
+	static game_index_t currentGame = GAME_EKANS;
 	SDL_Rect dstrect = { .x = 0, .y = 0, .w = 40, .h = 20 };
 	for(int y = 0;y < 12;y++){
 		for(int x = 0;x < 8;x++){
@@ -153,18 +146,20 @@ void Render_GameSelectMenu(void){
 	// XXX: Make this support more than one game when needed
 	Render_GameSelectMenu_RenderGame(&gGames[0], 0);
 
-	if(gRenderState.gameSelectMenu.fireUp != GAME_NONE || !gScreenFade) return;
+	if(!gScreenFade) return; // don't check input if mid-fade render
 
 	if(gJoypadPressed & (JOY_START | JOY_A)){
-		gRenderState.gameSelectMenu.fireUp = gRenderState.gameSelectMenu.currentGame;
+		CALL_UNLESS_NULL(gGames[currentGame].startFunction);
+		gRenderFunc = Render_FadeTransition;
+		gRenderFuncAfterFade = gGames[0].renderFunction;
 	}
 }
 
 void InitRandom(void){
 	u32 seed;
-	int fd = open("/dev/hwrng", O_RD);
-	ERROR_ON_SYS(fd < 0);
-	ERROR_ON_SYS(read(fd, &seed, 4) != 4);
+	int fd = open("/dev/hwrng", O_RDONLY);
+	ERROR_ON_SYS(fd < 0, "open hwrng");
+	ERROR_ON_SYS(read(fd, &seed, 4) != 4, "read hwrng");
 	close(fd);
 	srand(seed);
 }

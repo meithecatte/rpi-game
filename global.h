@@ -7,14 +7,14 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-#include "ekans.h"
-
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
+
+#include "ekans.h"
 
 typedef void (*init_func_t)(void);	// at bootup
 typedef void (*start_func_t)(void);	// when the game is opened
@@ -24,33 +24,6 @@ typedef void (*cleanup_func_t)(void);	// at shutdown
 
 typedef enum { GAME_EKANS = 0, GAME_NONE } game_index_t;
 typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
-
-typedef union {
-	struct {
-		u8 frameCounter;
-	} splash;
-
-	struct {
-		u16 scrollOffset;
-		game_index_t currentGame;
-		game_index_t fireUp;
-	} gameSelectMenu;
-
-	struct {
-		Ekans_Segment * head;
-		Ekans_Segment * tail;
-		int score;
-		int menuCursorLocation;
-		u8 framesPerUpdate;
-		u8 framesSinceLastUpdate;
-		ekans_difficulty_t difficulty;
-		ekans_state_t state;
-		ekans_direction_t direction;
-		u16 fruitX;
-		u16 fruitY;
-		Ekans_ScoresTableEntry highScoreTable[4][10]; // per difficulty, [diff][index]
-	} ekans;
-} render_state_t;
 
 typedef struct {
 	game_index_t gameIndex;
@@ -97,6 +70,7 @@ typedef struct {
 
 // main.c
 void cleanup(void);
+void InitRandom(void);
 void Render_DoFPS(void);
 void Render_SplashScreen(void);
 void Render_GameSelectMenu_RenderGame(const game_t * game, int dx);
@@ -107,7 +81,6 @@ extern SDL_Renderer * gRenderer;
 extern SDL_Texture * gScreen;
 extern u8 gScreenFade;
 extern render_func_t gRenderFunc;
-extern render_state_t gRenderState;
 extern u16 gJoypadHeld, gJoypadPressed;
 
 #define X(var,path,key) extern SDL_Texture * var;
