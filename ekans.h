@@ -30,8 +30,11 @@ typedef struct {
 	enum { MAIN_MENU, DIFFICULTY, PLAYING, PAUSED, HIGHSCORES, SAVE_HIGHSCORE } state;
 	u16 fruitX;
 	u16 fruitY;
-	Ekans_ScoresTableEntry highScoreTable[4][10]; // per difficulty, [diff][index]
+	Ekans_ScoresTableEntry highScoreTable[10];
 } ekans_state_t;
+
+extern const ekans_direction_t gEkansOppositeDirection[];
+extern ekans_state_t gEkansState;
 
 void Ekans_StartFunction(void);
 void Ekans_RenderFunction(void);
@@ -40,8 +43,4 @@ void Ekans_StopFunction(void);
 void Ekans_LoadHighscores(void);
 void Ekans_SaveHighscores(void);
 void Ekans_LogicUpdate(void);
-
-extern const ekans_direction_t gEkansOppositeDirection[];
-extern ekans_state_t gEkansState;
-
 #endif

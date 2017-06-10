@@ -17,8 +17,9 @@
 #define GPIO_JOY_DATA 4
 
 volatile u32 * gGPIO;
+u16 gJoypadHeld, gJoypadPressed;
 
-void InitJoypad(void){
+void Init_Joypad(void){
 	int mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
 
 	ERROR_ON_SYS(mem_fd < 0, "GPIO open");
@@ -37,22 +38,25 @@ void InitJoypad(void){
 	GPIO_HI(GPIO_JOY_CLOCK);
 }
 
-u16 ReadJoypad(void){
-	u16 readout = 0;
+void Read_Joypad(void){
+	u16 oldJoypad = gJoypadHeld;
+	gJoypadHeld = 0;
 
 	GPIO_HI(GPIO_JOY_LATCH); usleep(15);
 	GPIO_LO(GPIO_JOY_LATCH); usleep(15);
 
 	for(u8 i = 0;i < 12;i++){
-		readout <<= 1;
+		gJoypadHeld <<= 1;
 
 		if(!GET_GPIO(GPIO_JOY_DATA)){
-			readout |= 1;
+			gJoypadHeld |= 1;
 		}
 
 		GPIO_LO(GPIO_JOY_CLOCK); usleep(15);
 		GPIO_HI(GPIO_JOY_CLOCK); usleep(15);
 	}
 
-	return readout;
+	gJoypadPressed = gJoypadHeld & ~oldJoypad;
+
+	if(gJoypadHeld == (JOY_L | JOY_R | JOY_SELECT | JOY_START)) gExit = 1;
 }

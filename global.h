@@ -1,5 +1,13 @@
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define IMAGE_LIST \
+	X(gTextureFont8, "assets/font8.png", KEY_BLACK)				\
+	X(gTextureFont16, "assets/font16.png", KEY_BLACK)			\
+	X(gTextureSplash, "assets/splash.png", KEY_NONE)			\
+	X(gTextureMenuBackground, "assets/menu_background.png", KEY_NONE)
+
 #include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
@@ -14,108 +22,9 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 
-typedef void (*init_func_t)(void);	// at bootup
-typedef void (*start_func_t)(void);	// when the game is opened
-typedef void (*render_func_t)(void);	// every frame while the game is playing
-typedef void (*stop_func_t)(void);	// when the game is closed
-typedef void (*cleanup_func_t)(void);	// at shutdown
-
-typedef enum { GAME_EKANS = 0, GAME_NONE } game_index_t;
-typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
-
-typedef struct {
-	game_index_t gameIndex;
-	init_func_t initFunction;
-	start_func_t startFunction;
-	render_func_t renderFunction;
-	stop_func_t stopFunction;
-	cleanup_func_t cleanupFunction;
-	char * menuNameTop;
-	char * menuNameBottom;
-	char * menuIconPath;
-	SDL_Texture * menuIcon;
-} game_t;
-
-#define ERROR_ON_SDL(cond,mesg) if(cond){ \
-	fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, SDL_GetError());exit(1);}
-
-#define ERROR_ON_IMG(cond,mesg) if(cond){ \
-	fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, IMG_GetError());exit(1);}
-#define ERROR_ON_MIX(cond,mesg) if(cond){ \
-	fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, Mix_GetError());exit(1);}
-#define ERROR_ON_SYS(cond,mesg) if(cond){ \
-	fprintf(stderr,__FILE__ ":%d: " mesg " error (%d): %s\n", __LINE__, errno, strerror(errno));exit(1);}
-
-#define CALL_UNLESS_NULL(func) if(func) func()
-#define LENGTH(arr) (sizeof((arr))/sizeof((arr)[0]))
-
-#define JOY_SELECT 0x200
-#define JOY_START 0x100
-#define JOY_UP 0x080
-#define JOY_DOWN 0x040
-#define JOY_LEFT 0x020
-#define JOY_RIGHT 0x010
-#define JOY_A 0x008
-#define JOY_B 0x800
-#define JOY_X 0x004
-#define JOY_Y 0x400
-#define JOY_L 0x002
-#define JOY_R 0x001
-
-#define GAME_COUNT 1
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
-
-#define IMAGE_LIST \
-	X(gTextureFont8, "assets/font8.png", KEY_BLACK)				\
-	X(gTextureFont16, "assets/font16.png", KEY_BLACK)			\
-	X(gTextureSplash, "assets/splash.png", KEY_NONE)			\
-	X(gTextureMenuBackground, "assets/menu_background.png", KEY_NONE)
-
-// main.c
-void cleanup(void);
-void InitRandom(void);
-void Render_DoFPS(void);
-void Render_SplashScreen(void);
-void Render_GameSelectMenu_RenderGame(const game_t * game, int dx);
-void Render_GameSelectMenu(void);
-
-extern SDL_Window * gWindow;
-extern SDL_Renderer * gRenderer;
-extern SDL_Texture * gScreen;
-extern u8 gScreenFade;
-extern render_func_t gRenderFunc;
-extern u16 gJoypadHeld, gJoypadPressed;
-
-#define X(var,path,key) extern SDL_Texture * var;
-IMAGE_LIST
-#undef X
-
-// joypad.c
-void InitJoypad(void);
-u16 ReadJoypad(void);
-
-// gamedef.c
-extern game_t gGames[GAME_COUNT];
-
-// helper.c
-#define RenderChar8(x,y,c) RenderChar(x,y,c,8)
-#define RenderChar16(x,y,c) RenderChar(x,y,c,16)
-
-#define RenderText8(x,y,s) RenderText(x,y,s,8)
-#define RenderText16(x,y,s) RenderText(x,y,s,16)
-
-#define SetFontColor8(r,g,b) SDL_SetTextureColorMod(gTextureFont8, r, g, b);
-#define SetFontColor16(r,g,b) SDL_SetTextureColorMod(gTextureFont16, r, g, b);
-
-#define _malloc(size) _safe_malloc(size, __FILE__, __LINE__)
-
-SDL_Texture * loadTexture(const char * path, color_key_index_t key);
-void RenderChar(int x, int y, char c, int height);
-void RenderText(int x, int y, const char * s, int height);
-void Render_FadeIn(void);
-void Render_FadeTransition(void);
-void * _safe_malloc(size_t size, char * file, int line); // use the _malloc macro instead
-
-extern render_func_t gRenderFuncAfterFade;
+#include "gamedef.h"
+#include "joypad.h"
+#include "helper.h"
+#include "main.h"
+#include "ui.h"
 #endif

@@ -209,7 +209,3 @@ void Ekans_RenderFunction(void){
 		break;
 	}
 }
-
-void Ekans_StopFunction(void){
-	;
-}

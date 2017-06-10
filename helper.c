@@ -3,7 +3,7 @@
 
 render_func_t gRenderFuncAfterFade = NULL;
 
-SDL_Texture * loadTexture(const char * path, color_key_index_t key){
+SDL_Texture * LoadTexture(const char * path, color_key_index_t key){
 	printf("Loading %s\n", path);
 
 	SDL_Surface * surface = IMG_Load(path);
@@ -25,11 +25,11 @@ SDL_Texture * loadTexture(const char * path, color_key_index_t key){
 	return texture;
 }
 
-void * _safe_malloc(size_t size, char * file, int line){
+void * _safe_malloc(size_t size, char * error){
 	void * ptr = malloc(size);
 
 	if(ptr == NULL){
-		fprintf(stderr, "%s:%d: out of memory", file, line);
+		fprintf(stderr, error);
 		exit(1);
 	}
 
