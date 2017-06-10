@@ -10,11 +10,11 @@ SDL_Texture * loadTexture(const char * path, color_key_index_t key){
 	ERROR_ON_IMG(surface == NULL, "IMG_Load");
 
 	switch(key){
-		case KEY_NONE:
-			break;
-		case KEY_BLACK:
-			SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
-			break;
+	case KEY_NONE:
+		break;
+	case KEY_BLACK:
+		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
+		break;
 	}
 
 	SDL_Texture * texture = SDL_CreateTextureFromSurface(gRenderer, surface);
@@ -23,6 +23,17 @@ SDL_Texture * loadTexture(const char * path, color_key_index_t key){
 	SDL_FreeSurface(surface);
 
 	return texture;
+}
+
+void * _safe_malloc(size_t size, char * file, int line){
+	void * ptr = malloc(size);
+
+	if(ptr == NULL){
+		fprintf(stderr, "%s:%d: out of memory", file, line);
+		exit(1);
+	}
+
+	return ptr;
 }
 
 void RenderChar(int x, int y, char c, int height){

@@ -14,8 +14,6 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 
-#include "ekans.h"
-
 typedef void (*init_func_t)(void);	// at bootup
 typedef void (*start_func_t)(void);	// when the game is opened
 typedef void (*render_func_t)(void);	// every frame while the game is playing
@@ -38,10 +36,16 @@ typedef struct {
 	SDL_Texture * menuIcon;
 } game_t;
 
-#define ERROR_ON_SDL(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, SDL_GetError());exit(1);}
-#define ERROR_ON_IMG(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, IMG_GetError());exit(1);}
-#define ERROR_ON_MIX(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, Mix_GetError());exit(1);}
-#define ERROR_ON_SYS(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error (%d): %s\n", __LINE__, errno, strerror(errno));exit(1);}
+#define ERROR_ON_SDL(cond,mesg) if(cond){ \
+	fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, SDL_GetError());exit(1);}
+
+#define ERROR_ON_IMG(cond,mesg) if(cond){ \
+	fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, IMG_GetError());exit(1);}
+#define ERROR_ON_MIX(cond,mesg) if(cond){ \
+	fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, Mix_GetError());exit(1);}
+#define ERROR_ON_SYS(cond,mesg) if(cond){ \
+	fprintf(stderr,__FILE__ ":%d: " mesg " error (%d): %s\n", __LINE__, errno, strerror(errno));exit(1);}
+
 #define CALL_UNLESS_NULL(func) if(func) func()
 #define LENGTH(arr) (sizeof((arr))/sizeof((arr)[0]))
 
@@ -104,11 +108,14 @@ extern game_t gGames[GAME_COUNT];
 #define SetFontColor8(r,g,b) SDL_SetTextureColorMod(gTextureFont8, r, g, b);
 #define SetFontColor16(r,g,b) SDL_SetTextureColorMod(gTextureFont16, r, g, b);
 
+#define _malloc(size) _safe_malloc(size, __FILE__, __LINE__)
+
 SDL_Texture * loadTexture(const char * path, color_key_index_t key);
 void RenderChar(int x, int y, char c, int height);
 void RenderText(int x, int y, const char * s, int height);
 void Render_FadeIn(void);
 void Render_FadeTransition(void);
+void * _safe_malloc(size_t size, char * file, int line); // use the _malloc macro instead
 
 extern render_func_t gRenderFuncAfterFade;
 #endif
