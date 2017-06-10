@@ -20,7 +20,7 @@ rpi-game: $(OBJS) | dirs
 	@gcc $(LDFLAGS) $(OBJS) -o $@
 	@strip $@
 
-build/%.o: %.c $(HDRS) Makefile | dirs
+build/%.o: %.c $(HDRS) $(subst ./..h,,$(dir $<)$(patsubst %/,%.h,$(dir $<))) Makefile | dirs
 	@echo " CC $<"
 	@gcc $(CFLAGS) -c $< -o $@
 
