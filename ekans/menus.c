@@ -17,7 +17,7 @@ void Ekans_MainMenu(void){
 		if(gEkansState.menuCursorLocation > 0)
 			gEkansState.menuCursorLocation--;
 	}else if(gJoypadPressed & JOY_DOWN){
-		if(gEkansState.menuCursorLocation < 3)
+		if(gEkansState.menuCursorLocation <= 3)
 			gEkansState.menuCursorLocation++;
 	}else if(gJoypadPressed & (JOY_START | JOY_A)){
 		switch(gEkansState.menuCursorLocation){
@@ -49,7 +49,7 @@ void Ekans_DifficultyMenu(void){
 		if(gEkansState.difficulty > 0)
 			gEkansState.difficulty--;
 	}else if(gJoypadPressed & JOY_DOWN){
-		if(gEkansState.difficulty < 4)
+		if(gEkansState.difficulty <= 4)
 			gEkansState.difficulty++;
 	}else if(gJoypadPressed & JOY_A){
 		Ekans_StartGame();
