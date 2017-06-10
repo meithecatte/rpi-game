@@ -1,9 +1,8 @@
 CFLAGS := -std=gnu11 `sdl2-config --cflags` -O2 -Wall -Wextra -Werror
 LDFLAGS := `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm
 
-HDRS := global.h ekans.h
-OBJS := main joypad gamedef helper ekans
-OBJS := $(OBJS:%=build/%.o)
+HDRS := $(wildcard *.h)
+OBJS := $(patsubst %.c,build/%.o,$(wildcard *.c))
 
 all: rpi-game | dirs
 
