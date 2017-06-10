@@ -45,3 +45,8 @@ void Render_GameSelectMenu(void){
 		gRenderFuncAfterFade = gGames[0].renderFunction;
 	}
 }
+
+void GameExit(void){
+	gRenderFunc = Render_FadeTransition;
+	gRenderFuncAfterFade = Render_GameSelectMenu;
+}

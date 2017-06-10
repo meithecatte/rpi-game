@@ -3,4 +3,5 @@
 void Render_SplashScreen(void);
 void Render_GameSelectMenu_RenderGame(const game_t * game, int dx);
 void Render_GameSelectMenu(void);
+void GameExit(void);
 #endif

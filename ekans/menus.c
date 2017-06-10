@@ -25,8 +25,7 @@ void Ekans_MainMenu(void){
 			gEkansState.state = DIFFICULTY;
 			break;
 		case 2:
-			gRenderFunc = Render_FadeTransition;
-			gRenderFuncAfterFade = Render_GameSelectMenu;
+			GameExit();
 			break;
 		}
 	}
