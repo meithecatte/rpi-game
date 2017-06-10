@@ -38,10 +38,10 @@ typedef struct {
 	SDL_Texture * menuIcon;
 } game_t;
 
-#define ERROR_ON_SDL(cond,mesg) if(cond){fprintf(stderr,mesg " error: %s\n", SDL_GetError());exit(1);}
-#define ERROR_ON_IMG(cond,mesg) if(cond){fprintf(stderr,mesg " error: %s\n", IMG_GetError());exit(1);}
-#define ERROR_ON_MIX(cond,mesg) if(cond){fprintf(stderr,mesg " error: %s\n", Mix_GetError());exit(1);}
-#define ERROR_ON_SYS(cond,mesg) if(cond){fprintf(stderr,mesg " error (%d): %s\n", errno, strerror(errno));exit(1);}
+#define ERROR_ON_SDL(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, SDL_GetError());exit(1);}
+#define ERROR_ON_IMG(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, IMG_GetError());exit(1);}
+#define ERROR_ON_MIX(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error: %s\n", __LINE__, Mix_GetError());exit(1);}
+#define ERROR_ON_SYS(cond,mesg) if(cond){fprintf(stderr,__FILE__ ":%d: " mesg " error (%d): %s\n", __LINE__, errno, strerror(errno));exit(1);}
 #define CALL_UNLESS_NULL(func) if(func) func()
 #define LENGTH(arr) (sizeof((arr))/sizeof((arr)[0]))
 
