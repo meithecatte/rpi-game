@@ -1,8 +1,11 @@
-CFLAGS := -std=gnu11 `sdl2-config --cflags` -O2 -Wall -Wextra -Werror
+CFLAGS := -I. -std=gnu11 `sdl2-config --cflags` -O2 -Wall -Wextra -Werror
 LDFLAGS := `sdl2-config --libs` -lSDL2_image -lSDL2_mixer -lm
 
+GAMES := ekans
 HDRS := $(wildcard *.h)
-OBJS := $(patsubst %.c,build/%.o,$(wildcard *.c))
+MAIN := $(wildcard *.c)
+SRCS := $(MAIN) $(wildcard $(patsubst %,%/*.c,$(GAMES)))
+OBJS := $(patsubst %.c,build/%.o,$(SRCS))
 
 all: rpi-game | dirs
 
@@ -10,13 +13,15 @@ clean:
 	@rm -rf build rpi-game
 
 dirs:
-	@mkdir -p build
+	@mkdir -p build $(patsubst %,build/%,$(GAMES))
 
 rpi-game: $(OBJS) | dirs
+	@echo " LD rpi-game"
 	@gcc $(LDFLAGS) $(OBJS) -o $@
 	@strip $@
 
-build/%.o: %.c $(HDRS) | dirs
+build/%.o: %.c $(HDRS) Makefile | dirs
+	@echo " CC $<"
 	@gcc $(CFLAGS) -c $< -o $@
 
 .PHONY: all clean dirs
