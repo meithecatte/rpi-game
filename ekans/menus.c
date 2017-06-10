@@ -6,10 +6,10 @@ void Ekans_MainMenu(void){
 	SDL_RenderCopy(gRenderer, gGames[GAME_EKANS].menuIcon, NULL, &dstrect);
 
 	SetFontColor8(0, 0, 0);
-	RenderChar8(116, 100 + 12 * gEkansState.menuCursorLocation, 0x01); // cursor
-	RenderText8(124, 100, "New Game"); // menu entries
-	RenderText8(124, 112, "High Scores");
-	RenderText8(124, 124, "Exit");
+	RenderChar8(112, 100 + 12 * gEkansState.menuCursorLocation, 0x01); // cursor
+	RenderText8(120, 100, "New Game"); // menu entries
+	RenderText8(120, 112, "High Scores");
+	RenderText8(120, 124, "Exit");
 
 	if(!gScreenFade) return; // don't check input if mid-fade render
 
@@ -17,7 +17,7 @@ void Ekans_MainMenu(void){
 		if(gEkansState.menuCursorLocation > 0)
 			gEkansState.menuCursorLocation--;
 	}else if(gJoypadPressed & JOY_DOWN){
-		if(gEkansState.menuCursorLocation <= 3)
+		if(gEkansState.menuCursorLocation < 2)
 			gEkansState.menuCursorLocation++;
 	}else if(gJoypadPressed & (JOY_START | JOY_A)){
 		switch(gEkansState.menuCursorLocation){
@@ -49,7 +49,7 @@ void Ekans_DifficultyMenu(void){
 		if(gEkansState.difficulty > 0)
 			gEkansState.difficulty--;
 	}else if(gJoypadPressed & JOY_DOWN){
-		if(gEkansState.difficulty <= 4)
+		if(gEkansState.difficulty < 3)
 			gEkansState.difficulty++;
 	}else if(gJoypadPressed & JOY_A){
 		Ekans_StartGame();
