@@ -1,8 +1,8 @@
+#include "global.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-
-#include "global.h"
 
 // power of two recommended for performance - untested
 #define FRAME_VALUES 8
@@ -128,6 +128,8 @@ void Measure_FPS(void){
 	mDisplayFPS = floorf(mFPS + 0.5f);
 	if(mDisplayFPS > 99) mDisplayFPS = 99;
 
-	RenderChar16(0, 0, (mDisplayFPS / 10) + '0');
-	RenderChar16(8, 0, (mDisplayFPS % 10) + '0');
+	char * str = NULL;
+	asprintf(&str, "%d FPS; %d on heap", mDisplayFPS, gMallocCount);
+	RenderText16(0, 0, str);
+	free(str); // TEST_EXCEPTION
 }

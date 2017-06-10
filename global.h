@@ -1,5 +1,6 @@
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
+#define _GNU_SOURCE
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define IMAGE_LIST \

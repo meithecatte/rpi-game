@@ -2,6 +2,7 @@
 #define FADE_SPEED 16
 
 render_func_t gRenderFuncAfterFade = NULL;
+int gMallocCount;
 
 SDL_Texture * LoadTexture(const char * path, color_key_index_t key){
 	printf("Loading %s\n", path);
@@ -26,14 +27,20 @@ SDL_Texture * LoadTexture(const char * path, color_key_index_t key){
 }
 
 void * _safe_malloc(size_t size, char * error){
-	void * ptr = malloc(size);
+	void * ptr = malloc(size); // TEST_EXCEPTION
 
 	if(ptr == NULL){
 		fprintf(stderr, error);
 		exit(1);
 	}
 
+	gMallocCount++;
 	return ptr;
+}
+
+void _free(void * ptr){
+	gMallocCount--;
+	free(ptr); // TEST_EXCEPTION
 }
 
 void RenderChar(int x, int y, char c, int height){

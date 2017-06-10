@@ -31,9 +31,11 @@
 typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
 
 extern render_func_t gRenderFuncAfterFade;
+extern int gMallocCount;
 
 SDL_Texture * LoadTexture(const char * path, color_key_index_t key);
 void * _safe_malloc(size_t size, char * error); // use the _malloc macro instead
+void _free(void * ptr);
 void RenderChar(int x, int y, char c, int height);
 void RenderText(int x, int y, const char * s, int height);
 void Render_FadeIn(void);
