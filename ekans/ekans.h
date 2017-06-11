@@ -2,6 +2,7 @@
 #define _EKANS_H
 #define EKANS_PLAYFIELD_WIDTH 20
 #define EKANS_PLAYFIELD_HEIGHT 14
+#define EKANS_HIGHSCORE_NAME_LENGTH 7
 
 typedef enum { SLOW, NORMAL, FAST, INSANE } ekans_difficulty_t;
 typedef enum { UP, DOWN, LEFT, RIGHT, NONE } ekans_direction_t;
@@ -13,24 +14,26 @@ typedef struct __Ekans_Segment {
 } Ekans_Segment;
 
 typedef struct {
-	char name[4]; // 3 + NULL
+	char name[EKANS_HIGHSCORE_NAME_LENGTH + 1];
 	int score;
 } Ekans_ScoresTableEntry;
 
 typedef struct {
-	Ekans_Segment * head;
-	Ekans_Segment * tail;
-	int score;
-	int menuCursorLocation;
-	u8 framesPerUpdate;
-	u8 framesSinceLastUpdate;
 	ekans_direction_t inputForNextUpdate;
 	ekans_direction_t direction;
 	ekans_difficulty_t difficulty;
 	enum { MAIN_MENU, DIFFICULTY, PLAYING, PAUSED, GAME_OVER, HIGHSCORES, SAVE_HIGHSCORE } state;
+	int length;
+	int score;
+	int displayedScore;
+	int displayedHighScore;
 	u16 fruitX;
 	u16 fruitY;
-	Ekans_ScoresTableEntry highScoreTable[10];
+	u8 menuCursorLocation;
+	u8 framesSinceLastUpdate;
+	Ekans_Segment * head;
+	Ekans_Segment * tail;
+	Ekans_ScoresTableEntry highScores[10];
 } ekans_state_t;
 
 extern ekans_state_t gEkansState;

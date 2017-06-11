@@ -1,7 +1,15 @@
 #include "global.h"
 #include "ekans.h"
 
+#include <string.h>
+
 ekans_state_t gEkansState;
+const u8 gEkansFramesPerUpdate[] = {
+	[SLOW]   = 6,
+	[NORMAL] = 4,
+	[FAST]   = 3,
+	[INSANE] = 2,
+};
 
 void Ekans_StartFunc(void){
 	gEkansState.difficulty = NORMAL;
@@ -9,6 +17,11 @@ void Ekans_StartFunc(void){
 	gEkansState.head = NULL;
 	gEkansState.tail = NULL;
 	gEkansState.menuCursorLocation = 0;
+
+	for(u8 i = 0;i < LENGTH(gEkansState.highScores);i++){
+		strcpy(gEkansState.highScores[i].name, "");
+		gEkansState.highScores[i].score = 0;
+	}
 }
 
 void Ekans_RenderFunc(void){
@@ -38,7 +51,6 @@ void Ekans_StartGame(void){
 	gEkansState.state = PLAYING;
 	gEkansState.direction = LEFT;
 	gEkansState.score = 0;
-	gEkansState.framesPerUpdate = 3 * (4 - gEkansState.difficulty);
 	gEkansState.framesSinceLastUpdate = 0;
 	gEkansState.inputForNextUpdate = NONE;
 
@@ -75,10 +87,17 @@ void Ekans_RenderPlayfield(void){
 		curr = curr->next;
 		SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 	}
+
+	dstrect.x = 0;
+	dstrect.y = 224;
+	dstrect.w = 320;
+	dstrect.h = 1;
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(gRenderer, &dstrect);
 }
 
 void Ekans_LogicUpdate(void){
-	if(gEkansState.framesSinceLastUpdate >= gEkansState.framesPerUpdate){
+	if(gEkansState.framesSinceLastUpdate >= gEkansFramesPerUpdate[gEkansState.difficulty]){
 		gEkansState.framesSinceLastUpdate = 0;
 
 		if(gEkansState.inputForNextUpdate != NONE) gEkansState.direction = gEkansState.inputForNextUpdate;
