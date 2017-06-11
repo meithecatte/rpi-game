@@ -1,4 +1,9 @@
 #include "global.h"
+#define GAME_LOGO_WIDTH 192
+#define GAME_LOGO_HEIGHT 192
+#define MENU_SPACE_BELOW_LOGO 4
+#define MENU_BACKGROUND_WIDTH 40
+#define MENU_BACKGROUND_HEIGHT 20
 
 void Render_SplashScreen(void){
 	static int frameCounter;
@@ -13,24 +18,28 @@ void Render_SplashScreen(void){
 }
 
 void Render_GameSelectMenu_RenderGame(const game_t * game, int dx){
-	SDL_Rect dstrect = { .x = 112 + dx, .y = 64, .w = 96, .h = 96 };
+	int x = (SCREEN_WIDTH - GAME_LOGO_WIDTH) / 2 + dx;
+	int y = (SCREEN_HEIGHT - GAME_LOGO_HEIGHT - 2 * 16 + MENU_SPACE_BELOW_LOGO) / 2;
+	SDL_Rect dstrect = { .x = x, .y = y, .w = GAME_LOGO_WIDTH, .h = GAME_LOGO_HEIGHT };
 	SDL_RenderCopy(gRenderer, game->menuIcon, NULL, &dstrect);
 
 	SetFontColor16(0, 0, 0);
-	RenderText16((SCREEN_WIDTH - strlen(game->menuNameTop) * 8) / 2, 164 + dx, game->menuNameTop);
-	RenderText16((SCREEN_WIDTH - strlen(game->menuNameBottom) * 8) / 2, 180 + dx, game->menuNameBottom);
+	RenderText16((SCREEN_WIDTH - strlen(game->menuNameTop) * 8) / 2 + dx,
+		y + GAME_LOGO_HEIGHT + MENU_SPACE_BELOW_LOGO, game->menuNameTop);
+	RenderText16((SCREEN_WIDTH - strlen(game->menuNameBottom) * 8) / 2 + dx,
+		y + GAME_LOGO_HEIGHT + 16 + MENU_SPACE_BELOW_LOGO, game->menuNameBottom);
 }
 
 void Render_GameSelectMenu(void){
 	static game_index_t currentGame = GAME_EKANS;
-	SDL_Rect dstrect = { .x = 0, .y = 0, .w = 40, .h = 20 };
-	for(int y = 0;y < 12;y++){
-		for(int x = 0;x < 8;x++){
+	SDL_Rect dstrect = { .x = 0, .y = 0, .w = MENU_BACKGROUND_WIDTH, .h = MENU_BACKGROUND_HEIGHT };
+	for(int y = 0;y < (SCREEN_HEIGHT / MENU_BACKGROUND_HEIGHT);y++){
+		for(int x = 0;x < (SCREEN_WIDTH / MENU_BACKGROUND_WIDTH);x++){
 			SDL_RenderCopy(gRenderer, gTextureMenuBackground, NULL, &dstrect);
-			dstrect.x += 40;
+			dstrect.x += MENU_BACKGROUND_WIDTH;
 		}
 
-		dstrect.y += 20;
+		dstrect.y += MENU_BACKGROUND_HEIGHT;
 		dstrect.x = 0;
 	}
 	
