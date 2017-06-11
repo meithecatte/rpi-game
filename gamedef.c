@@ -2,8 +2,7 @@
 #include "ekans/ekans.h"
 
 game_t gGames[] = {
-	{
-		.gameIndex = GAME_EKANS,
+	[GAME_EKANS] = {
 		.startFunction = Ekans_StartFunc,
 		.renderFunction = Ekans_RenderFunc,
 		.menuNameTop = "Ekans",

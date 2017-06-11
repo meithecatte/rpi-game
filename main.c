@@ -20,7 +20,7 @@ render_func_t gRenderFunc = NULL;
 u8 gExit;
 u8 gScreenFade = 255;
 u32 gFrameTimes[FRAME_VALUES];
-u32 gFrameTimeLast, gFrameCount;
+u32 gFrameTimeLast;
 
 int main(void){
 	Init_Joypad();
@@ -39,7 +39,8 @@ int main(void){
 		gRenderFunc();
 
 		SDL_SetRenderTarget(gRenderer, NULL);
-		SDL_SetTextureColorMod(gScreen, gScreenFade, gScreenFade, gScreenFade);
+		SDL_SetTextureColorMod(gScreen, gScreenFade,
+			gScreenFade, gScreenFade);
 		SDL_RenderCopy(gRenderer, gScreen, NULL, NULL);
 
 		Measure_FPS();
@@ -51,26 +52,30 @@ int main(void){
 }
 
 void Load_Resources(void){
-#define X(var,path,key) var = LoadTexture(path,key);
+#define X(var,path,key) var = Load_Texture(path,key);
 	IMAGE_LIST
 #undef X
 
+	GameSelectMenu_PrepareBackground();
+
 	for(u8 i = 0;i < GAME_COUNT;i++){
-		gGames[i].menuIcon = LoadTexture(gGames[i].menuIconPath, KEY_NONE);
+		GameSelectMenu_RenderGame(&gGames[i]);
 	}
 }
 
 void Dealloc_Resources(void){
 	for(u8 i = 0;i < GAME_COUNT;i++){
-		if(gGames[i].menuIcon) SDL_DestroyTexture(gGames[i].menuIcon);
+		if(gGames[i].menuIcon){
+			SDL_DestroyTexture(gGames[i].menuIcon);
+		}
 	}
 
 #define X(var,path,key) if(var) SDL_DestroyTexture(var);
 IMAGE_LIST
 #undef X
 
-	if(gRenderer)	SDL_DestroyRenderer(gRenderer);
-	if(gWindow)	SDL_DestroyWindow(gWindow);
+	if(gRenderer) SDL_DestroyRenderer(gRenderer);
+	if(gWindow)   SDL_DestroyWindow(gWindow);
 }
 
 void Init_Random(void){
@@ -83,17 +88,22 @@ void Init_Random(void){
 }
 
 void Init_SDL(void){
-	ERROR_ON_SDL(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0, "SDL_Init"); atexit(SDL_Quit);
-	ERROR_ON_IMG(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG), "IMG_Init"); atexit(IMG_Quit);
-	ERROR_ON_MIX(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 1, 1024) < 0, "Mix_OpenAudio"); atexit(Mix_Quit);
+	ERROR_ON_SDL(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0,
+		"SDL_Init"); atexit(SDL_Quit);
+	ERROR_ON_IMG(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG),
+		"IMG_Init"); atexit(IMG_Quit);
+	ERROR_ON_MIX(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT,
+		1, 1024) < 0, "Mix_OpenAudio"); atexit(Mix_Quit);
 	atexit(Dealloc_Resources);
 
-	gWindow = SDL_CreateWindow("rpi-game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	gWindow = SDL_CreateWindow("rpi-game", SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
+		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 	ERROR_ON_SDL(!gWindow, "SDL_CreateWindow");
 	SDL_ShowCursor(SDL_DISABLE);
 
-	gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	gRenderer = SDL_CreateRenderer(gWindow, -1,
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	ERROR_ON_SDL(!gRenderer, "SDL_CreateRenderer");
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 
@@ -103,33 +113,33 @@ void Init_SDL(void){
 
 void Init_FPS(void){
 	memset(gFrameTimes, 0, sizeof(gFrameTimes));
-	gFrameCount = 0;
 	gFrameTimeLast = SDL_GetTicks();
 }
 
 void Measure_FPS(void){
-	u32 mCurrentTicks, mDisplayFPS;
-	float mFPS;
+	static u8 frameCount;
+	u32 currentTicks;
+	float fps;
 	
 	SetFontColor16(0x32, 0xCD, 0x32);
 
-	mCurrentTicks = SDL_GetTicks();
-	gFrameTimes[gFrameCount % FRAME_VALUES] = mCurrentTicks - gFrameTimeLast;
-	gFrameTimeLast = mCurrentTicks;
-	gFrameCount++;
+	currentTicks = SDL_GetTicks();
+	gFrameTimes[frameCount] = currentTicks - gFrameTimeLast;
+	gFrameTimeLast = currentTicks;
+	frameCount++;
+	frameCount %= FRAME_VALUES;
 
-	mFPS = 0;
+	fps = 0;
 	for(u8 i = 0;i < FRAME_VALUES;i++){
-		mFPS += gFrameTimes[i];
+		fps += gFrameTimes[i];
 	}
 
-	mFPS /= FRAME_VALUES;
-	mFPS = 1000.f / mFPS;
-	mDisplayFPS = floorf(mFPS + 0.5f);
-	if(mDisplayFPS > 99) mDisplayFPS = 99;
+	fps /= FRAME_VALUES;
+	fps = 1000.f / fps;
 
 	char * str = NULL;
-	asprintf(&str, "%d FPS; %d on heap", mDisplayFPS, gMallocCount);
+	asprintf(&str, "%d FPS; %d on heap",
+		(int)(fps + 0.5f), gMallocCount);
 	RenderText16(0, 0, str);
-	free(str); // TEST_EXCEPTION
+	free(str); // TEST_EXCEPTION - allocated by asprintf
 }

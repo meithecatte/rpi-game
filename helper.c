@@ -4,7 +4,7 @@
 render_func_t gRenderFuncAfterFade = NULL;
 int gMallocCount;
 
-SDL_Texture * LoadTexture(const char * path, color_key_index_t key){
+SDL_Texture * Load_Texture(const char * path, color_key_index_t key){
 	printf("Loading %s\n", path);
 
 	SDL_Surface * surface = IMG_Load(path);
