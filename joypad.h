@@ -13,7 +13,7 @@
 #define JOY_L 0x002
 #define JOY_R 0x001
 
-extern u16 gJoypadHeld, gJoypadPressed;
+extern uint16_t gJoypadHeld, gJoypadPressed;
 
 void Init_Joypad(void);
 void Read_Joypad(void);

@@ -1,5 +1,11 @@
 #include "global.h"
-
+#include "helper.h"
+#include "joypad.h"
+#include "main.h"
+#include "ui.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -17,10 +23,10 @@ SDL_Texture * gScreen = NULL;
 
 render_func_t gRenderFunc = NULL;
 
-u8 gExit;
-u8 gScreenFade = 255;
-u32 gFrameTimes[FRAME_VALUES];
-u32 gFrameTimeLast;
+bool gExit;
+uint8_t gScreenFade = 255;
+uint32_t gFrameTimes[FRAME_VALUES];
+uint32_t gFrameTimeLast;
 
 int main(void){
 	Init_Joypad();
@@ -30,7 +36,7 @@ int main(void){
 	Load_Resources();
 
 	gRenderFunc = Render_SplashScreen;
-	gExit = 0;
+	gExit = false;
 
 	while(!gExit){
 		SDL_SetRenderTarget(gRenderer, gScreen);
@@ -58,13 +64,13 @@ void Load_Resources(void){
 
 	GameSelectMenu_PrepareBackground();
 
-	for(u8 i = 0;i < GAME_COUNT;i++){
+	for(int i = 0;i < GAME_COUNT;i++){
 		GameSelectMenu_RenderGame(&gGames[i]);
 	}
 }
 
 void Dealloc_Resources(void){
-	for(u8 i = 0;i < GAME_COUNT;i++){
+	for(int i = 0;i < GAME_COUNT;i++){
 		if(gGames[i].menuIcon){
 			SDL_DestroyTexture(gGames[i].menuIcon);
 		}
@@ -79,7 +85,7 @@ IMAGE_LIST
 }
 
 void Init_Random(void){
-	u32 seed;
+	uint32_t seed;
 	int fd = open("/dev/hwrng", O_RDONLY);
 	ERROR_ON_SYS(fd < 0, "open hwrng");
 	ERROR_ON_SYS(read(fd, &seed, 4) != 4, "read hwrng");
@@ -117,8 +123,8 @@ void Init_FPS(void){
 }
 
 void Measure_FPS(void){
-	static u8 frameCount;
-	u32 currentTicks;
+	static int frameCount;
+	uint32_t currentTicks;
 	float fps;
 	
 	SetFontColor16(0x32, 0xCD, 0x32);
@@ -130,7 +136,7 @@ void Measure_FPS(void){
 	frameCount %= FRAME_VALUES;
 
 	fps = 0;
-	for(u8 i = 0;i < FRAME_VALUES;i++){
+	for(int i = 0;i < FRAME_VALUES;i++){
 		fps += gFrameTimes[i];
 	}
 

@@ -1,6 +1,7 @@
 #ifndef _GAMEDEF_H
 #define _GAMEDEF_H
 #define GAME_COUNT 1
+#include <SDL2/SDL.h>
 
 typedef void (*start_func_t)(void);
 typedef void (*render_func_t)(void);

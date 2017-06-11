@@ -1,8 +1,9 @@
+#include "global.h"
+#include "helper.h"
+#include "joypad.h"
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-#include "global.h"
 
 #define PERI_BASE 0x20000000
 #define GPIO_BASE (PERI_BASE + 0x200000)
@@ -16,8 +17,8 @@
 #define GPIO_JOY_LATCH 3
 #define GPIO_JOY_DATA 4
 
-volatile u32 * gGPIO;
-u16 gJoypadHeld, gJoypadPressed;
+volatile uint32_t * gGPIO;
+uint16_t gJoypadHeld, gJoypadPressed;
 
 void Init_Joypad(void){
 	int mem_fd = open("/dev/mem", O_RDWR | O_SYNC);
@@ -39,13 +40,13 @@ void Init_Joypad(void){
 }
 
 void Read_Joypad(void){
-	u16 oldJoypad = gJoypadHeld;
+	uint16_t oldJoypad = gJoypadHeld;
 	gJoypadHeld = 0;
 
 	GPIO_HI(GPIO_JOY_LATCH); usleep(15);
 	GPIO_LO(GPIO_JOY_LATCH); usleep(15);
 
-	for(u8 i = 0;i < 12;i++){
+	for(int i = 0;i < 12;i++){
 		gJoypadHeld <<= 1;
 
 		if(!GET_GPIO(GPIO_JOY_DATA)){
@@ -57,6 +58,4 @@ void Read_Joypad(void){
 	}
 
 	gJoypadPressed = gJoypadHeld & ~oldJoypad;
-
-	if(gJoypadHeld == (JOY_L | JOY_R | JOY_SELECT | JOY_START)) gExit = 1;
 }

@@ -1,16 +1,15 @@
 #ifndef _MAIN_H
 #define _MAIN_H
-extern SDL_Window * gWindow;
+#include "gamedef.h"
+#include "SDL2/SDL.h"
 extern SDL_Renderer * gRenderer;
-extern SDL_Texture * gScreen;
-extern u8 gScreenFade, gExit;
+extern uint8_t gScreenFade;
 extern render_func_t gRenderFunc;
 
 #define X(var,path,key) extern SDL_Texture * var;
 IMAGE_LIST
 #undef X
 
-int main(void);
 void Load_Resources(void);
 void Dealloc_Resources(void);
 void Init_Random(void);

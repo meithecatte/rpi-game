@@ -1,4 +1,7 @@
 #include "global.h"
+#include "helper.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #define FADE_SPEED 16
 
 render_func_t gRenderFuncAfterFade = NULL;
@@ -43,16 +46,22 @@ void _free(void * ptr){
 	free(ptr); // TEST_EXCEPTION
 }
 
-void RenderChar(int x, int y, char c, int height){
-	SDL_Rect srcrect = { .x = (c % 16) * 8, .y = (c / 16) * height, .w = 8, .h = height };
-	SDL_Rect dstrect = { .x = x, .y = y, .w = 8, .h = height };
-	SDL_RenderCopy(gRenderer, (height == 8) ? gTextureFont8 : gTextureFont16, &srcrect, &dstrect);
+void RenderChar(int x, int y, int scale,
+	char c, int height){
+	SDL_Rect srcrect = { .x = (c % 16) * 8, .y = (c / 16) * height,
+		.w = 8, .h = height };
+	SDL_Rect dstrect = { .x = x, .y = y,
+		.w = 8 * scale, .h = height * scale };
+	SDL_RenderCopy(gRenderer,
+		(height == 8) ? gTextureFont8 : gTextureFont16,
+		&srcrect, &dstrect);
 }
 
-void RenderText(int x, int y, const char * s, int height){
+void RenderText(int x, int y, int scale,
+	const char * s, int height){
 	while(*s){
-		RenderChar(x, y, *s++, height);
-		x += 8;
+		RenderChar(x, y, scale, *s++, height);
+		x += 8 * scale;
 	}
 }
 

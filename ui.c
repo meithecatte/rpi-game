@@ -1,4 +1,7 @@
 #include "global.h"
+#include "helper.h"
+#include "joypad.h"
+#include "ui.h"
 #define GAME_LOGO_WIDTH 96
 #define GAME_LOGO_HEIGHT 96
 #define MENU_BACKGROUND_WIDTH 40
