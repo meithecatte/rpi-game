@@ -1,0 +1,65 @@
+#include "global.h"
+#include "helper.h"
+#include "ekans.h"
+
+void Ekans_RenderPlayfield(void){
+	Ekans_RenderWalls();
+	Ekans_RenderScore();
+	SDL_Rect dstrect;
+	dstrect.w = 16;
+	dstrect.h = 16;
+
+	SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
+	dstrect.x = gEkansFruitX * 16;
+	dstrect.y = gEkansFruitY * 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
+
+	Ekans_Segment * curr = gEkansHead;
+	while(curr){
+		dstrect.x = curr->x * 16;
+		dstrect.y = curr->y * 16;
+		SDL_RenderFillRect(gRenderer, &dstrect);
+		curr = curr->next;
+		SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+	}
+}
+
+void Ekans_RenderScore(void){
+	SDL_Rect dstrect;
+
+	dstrect.x = 0;
+	dstrect.y = SCREEN_HEIGHT - 16;
+	dstrect.w = SCREEN_WIDTH;
+	dstrect.h = 1;
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(gRenderer, &dstrect);
+}
+
+void Ekans_RenderWalls(void){
+	SDL_Rect dstrect;
+
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 255, 255);
+	dstrect.x = 0;
+	dstrect.y = 0;
+	dstrect.w = 6 * 16;
+	dstrect.h = 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.x = SCREEN_WIDTH - 6 * 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.y = SCREEN_HEIGHT - 16 - 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.x = 0;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.x = 0;
+	dstrect.y = 16;
+	dstrect.w = 16;
+	dstrect.h = 5 * 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.x = SCREEN_WIDTH - 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.y = SCREEN_HEIGHT - 16 - 6 * 16;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+	dstrect.x = 0;
+	SDL_RenderFillRect(gRenderer, &dstrect);
+}

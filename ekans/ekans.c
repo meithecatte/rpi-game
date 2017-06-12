@@ -2,10 +2,8 @@
 #include "helper.h"
 #include "joypad.h"
 #include "ekans.h"
-#include <stdbool.h>
 #include <string.h>
 
-ekans_state_t gEkansState;
 const int gEkansFramesPerUpdate[] = {
 	[SLOW]   = 6,
 	[NORMAL] = 4,
@@ -14,15 +12,15 @@ const int gEkansFramesPerUpdate[] = {
 };
 
 void Ekans_StartFunc(void){
-	gEkansState.difficulty = NORMAL;
-	gEkansState.state = MAIN_MENU;
-	gEkansState.head = NULL;
-	gEkansState.tail = NULL;
-	gEkansState.menuCursorLocation = 0;
+	gEkansDifficulty = NORMAL;
+	gEkansState = MAIN_MENU;
+	gEkansHead = NULL;
+	gEkansTail = NULL;
+	gEkansMenuCursorLocation = 0;
 
-	for(int i = 0;i < LENGTH(gEkansState.highScores);i++){
-		strcpy(gEkansState.highScores[i].name, "");
-		gEkansState.highScores[i].score = 0;
+	for(int i = 0;i < LENGTH(gEkansHighScores);i++){
+		strcpy(gEkansHighScores[i].name, "");
+		gEkansHighScores[i].score = 0;
 	}
 }
 
@@ -30,7 +28,7 @@ void Ekans_RenderFunc(void){
 	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(gRenderer);
 
-	switch(gEkansState.state){
+	switch(gEkansState){
 	case MAIN_MENU:
 		Ekans_MainMenu();
 		break;
@@ -39,151 +37,139 @@ void Ekans_RenderFunc(void){
 		break;
 	case PLAYING:
 		Ekans_ProcessInput();
-		Ekans_LogicUpdate();
+
+		if(gEkansFramesSinceLastUpdate
+				>= gEkansFramesPerUpdate[gEkansDifficulty]){
+			gEkansFramesSinceLastUpdate = 0;
+			Ekans_LogicUpdate();
+		}else{
+			gEkansFramesSinceLastUpdate++;
+		}
+
 		Ekans_RenderPlayfield();
 		break;
 	case GAME_OVER:
-		gEkansState.state = MAIN_MENU;
+		gEkansState = MAIN_MENU;
 	default:
 		break;
 	}
 }
 
 void Ekans_StartGame(void){
-	gEkansState.state = PLAYING;
-	gEkansState.direction = LEFT;
-	gEkansState.score = 0;
-	gEkansState.framesSinceLastUpdate = 0;
-	gEkansState.inputForNextUpdate = NONE;
+	gEkansState = PLAYING;
+	gEkansDirection = LEFT;
+	gEkansScore = 0;
+	gEkansFramesSinceLastUpdate = 0;
+	gEkansInputForNextUpdate = NONE;
 
-	gEkansState.head = _malloc(sizeof(Ekans_Segment));
-	gEkansState.head->x = 10;
-	gEkansState.head->y = 5;
-	gEkansState.head->prev = NULL;
-	gEkansState.head->next = NULL;
-	gEkansState.tail = gEkansState.head;
+	gEkansHead = _malloc(sizeof(Ekans_Segment));
+	gEkansHead->x = 18;
+	gEkansHead->y = 14;
+	gEkansHead->prev = NULL;
+	gEkansHead->next = NULL;
+	gEkansTail = gEkansHead;
 
-	Ekans_AddSegment(9, 5);
-	Ekans_AddSegment(8, 5);
-	Ekans_AddSegment(7, 5);
-	Ekans_AddSegment(6, 5);
+	Ekans_AddSegment(17, 14);
+	Ekans_AddSegment(16, 14);
+	Ekans_AddSegment(15, 14);
 	Ekans_RandomizeFruitLocation();
 }
 
-void Ekans_RenderPlayfield(void){
-	SDL_Rect dstrect;
-	dstrect.w = 16;
-	dstrect.h = 16;
-
-	SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-	dstrect.x = gEkansState.fruitX * 16;
-	dstrect.y = gEkansState.fruitY * 16;
-	SDL_RenderFillRect(gRenderer, &dstrect);
-
-	SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
-	Ekans_Segment * curr = gEkansState.head;
-	while(curr){
-		dstrect.x = curr->x * 16;
-		dstrect.y = curr->y * 16;
-		SDL_RenderFillRect(gRenderer, &dstrect);
-		curr = curr->next;
-		SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+void Ekans_LogicUpdate(void){
+	if(gEkansInputForNextUpdate != NONE){
+		gEkansDirection = gEkansInputForNextUpdate;
 	}
 
-	dstrect.x = 0;
-	dstrect.y = 224;
-	dstrect.w = 320;
-	dstrect.h = 1;
-	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-	SDL_RenderFillRect(gRenderer, &dstrect);
-}
+	gEkansInputForNextUpdate = NONE;
 
-void Ekans_LogicUpdate(void){
-	if(gEkansState.framesSinceLastUpdate >= gEkansFramesPerUpdate[gEkansState.difficulty]){
-		gEkansState.framesSinceLastUpdate = 0;
+	int newHeadX = gEkansHead->x;
+	int newHeadY = gEkansHead->y;
 
-		if(gEkansState.inputForNextUpdate != NONE) gEkansState.direction = gEkansState.inputForNextUpdate;
-		gEkansState.inputForNextUpdate = NONE;
+	switch(gEkansDirection){
+	case UP:	newHeadY--; break;
+	case DOWN:	newHeadY++; break;
+	case LEFT:	newHeadX--; break;
+	case RIGHT:	newHeadX++; break;
+	case NONE:	fprintf(stderr, "no direction WTF"); exit(1);
+	}
 
-		int newHeadX = gEkansState.head->x;
-		int newHeadY = gEkansState.head->y;
+	if(newHeadX < 0){
+		newHeadX += EKANS_PLAYFIELD_WIDTH;
+	}else if(newHeadX >= EKANS_PLAYFIELD_WIDTH){
+		newHeadX -= EKANS_PLAYFIELD_WIDTH;
+	}
 
-		switch(gEkansState.direction){
-		case UP:	newHeadY--; break;
-		case DOWN:	newHeadY++; break;
-		case LEFT:	newHeadX--; break;
-		case RIGHT:	newHeadX++; break;
-		case NONE:	fprintf(stderr, "%s:%d: no direction WTF", __FILE__, __LINE__); exit(1);
-		}
+	if(newHeadY < 0){
+		newHeadY += EKANS_PLAYFIELD_HEIGHT;
+	}else if(newHeadY >= EKANS_PLAYFIELD_HEIGHT){
+		newHeadY -= EKANS_PLAYFIELD_HEIGHT;
+	}
 
-		if(newHeadX == gEkansState.fruitX && newHeadY == gEkansState.fruitY){
-			Ekans_AddSegment(newHeadX, newHeadY);
-			Ekans_RandomizeFruitLocation();
-		}else{
-			if(Ekans_IsOccupied(newHeadX, newHeadY)){
-				// XXX: Check for highscore
-				gEkansState.state = GAME_OVER;
-			}
-
-			Ekans_Segment * newHead = gEkansState.tail;
-			newHead->x = newHeadX;
-			newHead->y = newHeadY;
-
-			gEkansState.head->prev = newHead;
-			gEkansState.tail = newHead->prev;
-			newHead->prev->next = NULL;
-			newHead->prev = NULL;
-			newHead->next = gEkansState.head;
-			gEkansState.head = newHead;
-		}
+	if(newHeadX == gEkansFruitX &&
+			newHeadY == gEkansFruitY){
+		Ekans_AddSegment(newHeadX, newHeadY);
+		Ekans_RandomizeFruitLocation();
 	}else{
-		gEkansState.framesSinceLastUpdate++;
+		if(Ekans_IsOccupied(newHeadX, newHeadY)){
+			// XXX: Check for highscore
+			gEkansState = GAME_OVER;
+		}
+
+		Ekans_Segment * newHead = gEkansTail;
+		newHead->x = newHeadX;
+		newHead->y = newHeadY;
+
+		gEkansHead->prev = newHead;
+		gEkansTail = newHead->prev;
+		newHead->prev->next = NULL;
+		newHead->prev = NULL;
+		newHead->next = gEkansHead;
+		gEkansHead = newHead;
 	}
 }
 
 void Ekans_ProcessInput(void){
-	if(gEkansState.inputForNextUpdate == NONE){
-		switch(gEkansState.direction){
+	if(gEkansInputForNextUpdate == NONE){
+		switch(gEkansDirection){
 		case UP:
 		case DOWN:
 			if(gJoypadPressed & JOY_LEFT){
-				gEkansState.inputForNextUpdate = LEFT;
+				gEkansInputForNextUpdate = LEFT;
 			}else if(gJoypadPressed & JOY_RIGHT){
-				gEkansState.inputForNextUpdate = RIGHT;
+				gEkansInputForNextUpdate = RIGHT;
 			}
 
 			break;
 		case LEFT:
 		case RIGHT:
 			if(gJoypadPressed & JOY_UP){
-				gEkansState.inputForNextUpdate = UP;
+				gEkansInputForNextUpdate = UP;
 			}else if(gJoypadPressed & JOY_DOWN){
-				gEkansState.inputForNextUpdate = DOWN;
+				gEkansInputForNextUpdate = DOWN;
 			}
 			
 			break;
 		case NONE:
-			fprintf(stderr, "%s:%d: no direction WTF", __FILE__, __LINE__);
+			fprintf(stderr, "no direction WTF");
 			exit(1);
 		}
 	}
 }
 
 void Ekans_AddSegment(int x, int y){
-	Ekans_Segment * new_segment = _malloc(sizeof(Ekans_Segment));
-	new_segment->prev = NULL;
-	new_segment->next = gEkansState.head;
-	new_segment->x = x;
-	new_segment->y = y;
-	gEkansState.head->prev = new_segment;
-	gEkansState.head = new_segment;
+	Ekans_Segment * newSegment = _malloc(sizeof(Ekans_Segment));
+	newSegment->prev = NULL;
+	newSegment->next = gEkansHead;
+	newSegment->x = x;
+	newSegment->y = y;
+	gEkansHead->prev = newSegment;
+	gEkansHead = newSegment;
 }
 
 bool Ekans_IsOccupied(int x, int y){
-	Ekans_Segment * curr = gEkansState.head;
+	Ekans_Segment * curr = gEkansHead;
 
-	if(x < 0 || x > EKANS_PLAYFIELD_WIDTH) return true;
-	if(y < 0 || y > EKANS_PLAYFIELD_HEIGHT) return true;
+	if(Ekans_IsWall(x, y)) return true;
 
 	while(curr){
 		if(curr->x == x && curr->y == y){
@@ -196,9 +182,19 @@ bool Ekans_IsOccupied(int x, int y){
 	return false;
 }
 
+bool Ekans_IsWall(int x, int y){
+	if(x == 0 || x == EKANS_PLAYFIELD_WIDTH - 1){
+		return y <= 5 || y >= EKANS_PLAYFIELD_HEIGHT - 6;
+	}else if(y == 0 || y == EKANS_PLAYFIELD_HEIGHT - 1){
+		return x <= 5 || x >= EKANS_PLAYFIELD_WIDTH - 6;
+	}
+	
+	return false;
+}
+
 void Ekans_RandomizeFruitLocation(void){
 	do {
-		gEkansState.fruitX = rand() % EKANS_PLAYFIELD_WIDTH;
-		gEkansState.fruitY = rand() % EKANS_PLAYFIELD_HEIGHT;
-	}while(Ekans_IsOccupied(gEkansState.fruitX, gEkansState.fruitY));
+		gEkansFruitX = rand() % EKANS_PLAYFIELD_WIDTH;
+		gEkansFruitY = rand() % EKANS_PLAYFIELD_HEIGHT;
+	}while(Ekans_IsOccupied(gEkansFruitX, gEkansFruitY));
 }
