@@ -11,17 +11,25 @@ const int gEkansFramesPerUpdate[] = {
 	[INSANE] = 2,
 };
 
+const int gEkansScoreMultiplier[] = {
+	[SLOW]   = 2,
+	[NORMAL] = 3,
+	[FAST]   = 4,
+	[INSANE] = 5,
+};
+
 void Ekans_StartFunc(void){
+	for(int i = 0;i < LENGTH(gEkansHighScores);i++){
+		strcpy(gEkansHighScores[i].name, "");
+		gEkansHighScores[i].score = 0;
+	}
+
 	gEkansDifficulty = NORMAL;
 	gEkansState = MAIN_MENU;
 	gEkansHead = NULL;
 	gEkansTail = NULL;
 	gEkansMenuCursorLocation = 0;
-
-	for(int i = 0;i < LENGTH(gEkansHighScores);i++){
-		strcpy(gEkansHighScores[i].name, "");
-		gEkansHighScores[i].score = 0;
-	}
+	gEkansVHighScore = gEkansHighScores[0].score;
 }
 
 void Ekans_RenderFunc(void){
@@ -59,8 +67,10 @@ void Ekans_StartGame(void){
 	gEkansState = PLAYING;
 	gEkansDirection = LEFT;
 	gEkansScore = 0;
+	gEkansVScore = 0;
 	gEkansFramesSinceLastUpdate = 0;
 	gEkansInputForNextUpdate = NONE;
+	gEkansLength = 1;
 
 	gEkansHead = _malloc(sizeof(Ekans_Segment));
 	gEkansHead->x = 18;
@@ -107,6 +117,9 @@ void Ekans_LogicUpdate(void){
 
 	if(newHeadX == gEkansFruitX &&
 			newHeadY == gEkansFruitY){
+		gEkansScore += 3 * gEkansLength
+			* gEkansScoreMultiplier[gEkansDifficulty];
+		gEkansScore += rand() % 9 + 1;
 		Ekans_AddSegment(newHeadX, newHeadY);
 		Ekans_RandomizeFruitLocation();
 	}else{
@@ -164,6 +177,8 @@ void Ekans_AddSegment(int x, int y){
 	newSegment->y = y;
 	gEkansHead->prev = newSegment;
 	gEkansHead = newSegment;
+
+	gEkansLength++;
 }
 
 bool Ekans_IsOccupied(int x, int y){

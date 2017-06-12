@@ -1,7 +1,7 @@
 #ifndef _EKANS_H
 #define _EKANS_H
 #define EKANS_PLAYFIELD_WIDTH 40
-#define EKANS_PLAYFIELD_HEIGHT 29
+#define EKANS_PLAYFIELD_HEIGHT 28
 #define EKANS_HIGHSCORE_NAME_LENGTH 7
 #include "helper.h"
 

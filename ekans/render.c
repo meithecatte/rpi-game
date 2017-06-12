@@ -1,6 +1,7 @@
 #include "global.h"
 #include "helper.h"
 #include "ekans.h"
+#include <math.h>
 
 void Ekans_RenderPlayfield(void){
 	Ekans_RenderWalls();
@@ -29,11 +30,23 @@ void Ekans_RenderScore(void){
 	SDL_Rect dstrect;
 
 	dstrect.x = 0;
-	dstrect.y = SCREEN_HEIGHT - 16;
+	dstrect.y = SCREEN_HEIGHT - 32;
 	dstrect.w = SCREEN_WIDTH;
 	dstrect.h = 1;
 	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 	SDL_RenderFillRect(gRenderer, &dstrect);
+
+	gEkansVScore += ceilf((gEkansScore - gEkansVScore) / 10.f);
+
+	if(gEkansVScore > gEkansVHighScore){
+		gEkansVHighScore = gEkansVScore;
+	}
+
+	char * buffer;
+	asprintf(&buffer, "Score: %06d        High Score: %06d",
+		gEkansVScore, gEkansVHighScore);
+	RenderText8s(8, SCREEN_HEIGHT - 24, 2, buffer);
+	free(buffer); // TEST_EXCEPTION
 }
 
 void Ekans_RenderWalls(void){
@@ -45,9 +58,9 @@ void Ekans_RenderWalls(void){
 	dstrect.w = 6 * 16;
 	dstrect.h = 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
-	dstrect.x = SCREEN_WIDTH - 6 * 16;
+	dstrect.x = (EKANS_PLAYFIELD_WIDTH - 6) * 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
-	dstrect.y = SCREEN_HEIGHT - 16 - 16;
+	dstrect.y = (EKANS_PLAYFIELD_HEIGHT - 1) * 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
 	dstrect.x = 0;
 	SDL_RenderFillRect(gRenderer, &dstrect);
@@ -56,9 +69,9 @@ void Ekans_RenderWalls(void){
 	dstrect.w = 16;
 	dstrect.h = 5 * 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
-	dstrect.x = SCREEN_WIDTH - 16;
+	dstrect.x = (EKANS_PLAYFIELD_WIDTH - 1) * 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
-	dstrect.y = SCREEN_HEIGHT - 16 - 6 * 16;
+	dstrect.y = (EKANS_PLAYFIELD_HEIGHT - 6) * 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
 	dstrect.x = 0;
 	SDL_RenderFillRect(gRenderer, &dstrect);
