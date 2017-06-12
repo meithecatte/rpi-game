@@ -42,11 +42,10 @@ void Ekans_RenderScore(void){
 		gEkansVHighScore = gEkansVScore;
 	}
 
-	char * buffer;
-	asprintf(&buffer, "Score: %06d        High Score: %06d",
+	char buffer[39];
+	sprintf(buffer, "Score: %06d        High Score: %06d",
 		gEkansVScore, gEkansVHighScore);
 	RenderText8s(8, SCREEN_HEIGHT - 24, 2, buffer);
-	free(buffer); // TEST_EXCEPTION
 }
 
 void Ekans_RenderWalls(void){
