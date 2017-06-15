@@ -2,12 +2,14 @@
 #define _EKANS_H
 #define EKANS_PLAYFIELD_WIDTH 40
 #define EKANS_PLAYFIELD_HEIGHT 28
-#define EKANS_HIGHSCORE_NAME_LENGTH 7
-#define EKANS_NUM_HIGHSCORES 10
+#define EKANS_SCORE_NAME_LENGTH 7
+#define EKANS_NUM_SCORES 10
 #include "global.h"
 
 typedef enum { SLOW, NORMAL, FAST, INSANE } ekans_difficulty_t;
 typedef enum { UP, DOWN, LEFT, RIGHT, NONE } ekans_direction_t;
+typedef enum { MAIN_MENU, DIFFICULTY, PLAYING, PAUSED, GAME_OVER,
+	HIGHSCORES } ekans_state_t;
 
 typedef struct __Ekans_Segment {
 	struct __Ekans_Segment * prev; // NULL if head
@@ -16,30 +18,31 @@ typedef struct __Ekans_Segment {
 } Ekans_Segment;
 
 typedef struct {
-	char name[EKANS_HIGHSCORE_NAME_LENGTH + 1];
+	char name[EKANS_SCORE_NAME_LENGTH + 1];
 	int score;
 } Ekans_ScoresTableEntry;
 
-ekans_direction_t gEkansInputForNextUpdate;
-ekans_direction_t gEkansDirection;
-ekans_difficulty_t gEkansDifficulty;
-enum { MAIN_MENU, DIFFICULTY, PLAYING, PAUSED, GAME_OVER,
-	HIGHSCORES, SAVE_HIGHSCORE } gEkansState;
-int gEkansLength;
-int gEkansScore;
-int gEkansVScore;
-int gEkansVHighScore;
-int gEkansFruitX;
-int gEkansFruitY;
-int gEkansMenuCursorLocation;
-int gEkansFramesSinceLastUpdate;
-int gEkansGameOverFade;
-int gEkansScoreIndex; // set to the index to gEkansHighscores
-					// when entering the name
-SDL_Texture * gEkansTempTexture;
-Ekans_Segment * gEkansHead;
-Ekans_Segment * gEkansTail;
-Ekans_ScoresTableEntry gEkansHighscores[EKANS_NUM_HIGHSCORES];
+extern ekans_direction_t gEkansInputForNextUpdate;
+extern ekans_direction_t gEkansDirection;
+extern ekans_difficulty_t gEkansDifficulty;
+extern ekans_state_t gEkansState;
+extern int gEkansLength;
+extern int gEkansScore;
+extern int gEkansVScore;
+extern int gEkansVHighScore;
+extern int gEkansFruitX;
+extern int gEkansFruitY;
+extern int gEkansMenuCursorLocation;
+extern int gEkansFramesSinceLastUpdate;
+extern int gEkansGameOverFade;
+extern int gEkansScoreIndex;
+extern int gEkansNameEntryBlinkCounter;
+extern char gEkansScoreName[EKANS_SCORE_NAME_LENGTH + 1];
+extern bool gEkansNameEntryFinished;
+extern SDL_Texture * gEkansTempTexture;
+extern Ekans_Segment * gEkansHead;
+extern Ekans_Segment * gEkansTail;
+extern Ekans_ScoresTableEntry gEkansHighscores[EKANS_NUM_SCORES];
 
 void Ekans_StartFunc(void);
 void Ekans_RenderFunc(void);
@@ -61,7 +64,8 @@ void Ekans_DrawLogo(void);
 
 void Ekans_GameOver(void);
 void Ekans_GameOverScreen(void);
-void Ekans_RenderHighscores(char * header, bool newHighscore);
+void Ekans_FinishNameEntry(void);
+void Ekans_RenderHighscores(char * header, char * subHeader);
 void Ekans_LoadHighscores(void);
 void Ekans_SaveHighscores(void);
 #endif

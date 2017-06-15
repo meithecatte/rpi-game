@@ -12,15 +12,18 @@ void Ekans_RenderPlayfield(void){
 	dstrect.x = gEkansFruitX * 16;
 	dstrect.y = gEkansFruitY * 16;
 	SDL_RenderFillRect(gRenderer, &dstrect);
-	SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 
-	Ekans_Segment * curr = gEkansHead;
+	Ekans_Segment * curr = gEkansTail;
 	while(curr){
+		if(curr == gEkansHead){
+			SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
+		}
+
 		dstrect.x = curr->x * 16;
 		dstrect.y = curr->y * 16;
 		SDL_RenderFillRect(gRenderer, &dstrect);
-		curr = curr->next;
-		SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+		curr = curr->prev;
 	}
 }
 

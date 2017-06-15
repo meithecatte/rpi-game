@@ -16,12 +16,26 @@ const int gEkansScoreMultiplier[] = {
 	[INSANE] = 5,
 };
 
+ekans_direction_t gEkansInputForNextUpdate;
+ekans_direction_t gEkansDirection;
+ekans_difficulty_t gEkansDifficulty;
+ekans_state_t gEkansState;
+
+int gEkansLength, gEkansScore, gEkansVScore, gEkansVHighScore;
+int gEkansFruitX, gEkansFruitY, gEkansMenuCursorLocation;
+int gEkansFramesSinceLastUpdate;
+
+Ekans_Segment * gEkansHead;
+Ekans_Segment * gEkansTail;
+Ekans_ScoresTableEntry gEkansHighscores[EKANS_NUM_SCORES];
+
 void Ekans_StartFunc(void){
-	for(int i = 0;i < EKANS_NUM_HIGHSCORES;i++){
-		strcpy(gEkansHighscores[i].name, "TEST000");
-		gEkansHighscores[i].name[6] = '0' + i;
-		gEkansHighscores[i].score = 150 - i * 12;
+	for(int i = 0;i < EKANS_NUM_SCORES;i++){
+		strcpy(gEkansHighscores[i].name, "");
+		gEkansHighscores[i].score = 0;
 	}
+
+	strcpy(gEkansScoreName, "A");
 
 	gEkansDifficulty = NORMAL;
 	gEkansState = MAIN_MENU;
@@ -73,7 +87,7 @@ void Ekans_RenderFunc(void){
 			SDL_SetRenderTarget(gRenderer, gEkansTempTexture);
 			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
 			SDL_RenderClear(gRenderer);
-			Ekans_RenderHighscores("High Scores", false);
+			Ekans_RenderHighscores("High Scores", NULL);
 			SDL_SetRenderTarget(gRenderer, gScreen);
 			SDL_SetTextureColorMod(gEkansTempTexture,
 				255, 255, 255);
