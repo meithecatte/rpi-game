@@ -7,8 +7,8 @@ OBJS := $(patsubst %.c,build/%.o,$(SRCS))
 
 all: rpi-game | dirs
 	@echo Checking heap wrapper usage...
-	@git grep '[^_]\(malloc\|free\)' | grep -v 'TEST_EXCEPTION' || true
-	@[ `git grep '[^_]\(malloc\|free\)' | grep -v 'TEST_EXCEPTION' | wc -l` -eq 0 ]
+	@grep '[^_]\(malloc\|free\)' $(SRCS) | grep -v 'TEST_EXCEPTION' || true
+	@[ `grep '[^_]\(malloc\|free\)' $(SRCS) | grep -v 'TEST_EXCEPTION' | wc -l` -eq 0 ]
 clean:
 	@rm -rf build rpi-game
 
