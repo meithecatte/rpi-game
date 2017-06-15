@@ -1,5 +1,4 @@
 #include "global.h"
-#include "helper.h"
 #include "joypad.h"
 #include "main.h"
 #include "ui.h"
@@ -80,6 +79,7 @@ void Dealloc_Resources(void){
 IMAGE_LIST
 #undef X
 
+	if(gScreen)   SDL_DestroyTexture(gScreen);
 	if(gRenderer) SDL_DestroyRenderer(gRenderer);
 	if(gWindow)   SDL_DestroyWindow(gWindow);
 }
@@ -115,6 +115,7 @@ void Init_SDL(void){
 
 	gScreen = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_ABGR8888,
 		SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+	ERROR_ON_SDL(!gScreen, "SDL_CreateTexture")
 }
 
 void Init_FPS(void){

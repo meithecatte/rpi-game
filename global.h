@@ -12,5 +12,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "main.h"
+#include "helper.h"
 void GameExit(void);
 #endif

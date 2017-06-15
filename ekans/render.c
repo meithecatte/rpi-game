@@ -1,5 +1,3 @@
-#include "global.h"
-#include "helper.h"
 #include "ekans.h"
 #include <math.h>
 

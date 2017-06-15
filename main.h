@@ -1,8 +1,9 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 #include "gamedef.h"
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 extern SDL_Renderer * gRenderer;
+extern SDL_Texture * gScreen;
 extern uint8_t gScreenFade;
 extern render_func_t gRenderFunc;
 

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "helper.h"
 #include "joypad.h"
 #include <sys/mman.h>
 #include <fcntl.h>

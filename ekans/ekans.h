@@ -3,7 +3,8 @@
 #define EKANS_PLAYFIELD_WIDTH 40
 #define EKANS_PLAYFIELD_HEIGHT 28
 #define EKANS_HIGHSCORE_NAME_LENGTH 7
-#include "helper.h"
+#define EKANS_NUM_HIGHSCORES 10
+#include "global.h"
 
 typedef enum { SLOW, NORMAL, FAST, INSANE } ekans_difficulty_t;
 typedef enum { UP, DOWN, LEFT, RIGHT, NONE } ekans_direction_t;
@@ -32,12 +33,17 @@ int gEkansFruitX;
 int gEkansFruitY;
 int gEkansMenuCursorLocation;
 int gEkansFramesSinceLastUpdate;
+int gEkansGameOverFade;
+int gEkansScoreIndex; // set to the index to gEkansHighscores
+					// when entering the name
+SDL_Texture * gEkansTempTexture;
 Ekans_Segment * gEkansHead;
 Ekans_Segment * gEkansTail;
-Ekans_ScoresTableEntry gEkansHighScores[10];
+Ekans_ScoresTableEntry gEkansHighscores[EKANS_NUM_HIGHSCORES];
 
 void Ekans_StartFunc(void);
 void Ekans_RenderFunc(void);
+void Ekans_StopFunc(void);
 void Ekans_StartGame(void);
 void Ekans_RenderPlayfield(void);
 void Ekans_RenderScore(void);
@@ -53,6 +59,9 @@ void Ekans_MainMenu(void);
 void Ekans_DifficultyMenu(void);
 void Ekans_DrawLogo(void);
 
+void Ekans_GameOver(void);
+void Ekans_GameOverScreen(void);
+void Ekans_RenderHighscores(char * header, bool newHighscore);
 void Ekans_LoadHighscores(void);
 void Ekans_SaveHighscores(void);
 #endif

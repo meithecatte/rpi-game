@@ -12,6 +12,7 @@
 #define JOY_Y 0x400
 #define JOY_L 0x002
 #define JOY_R 0x001
+#include "global.h"
 
 extern uint16_t gJoypadHeld, gJoypadPressed;
 

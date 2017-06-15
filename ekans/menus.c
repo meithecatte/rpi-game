@@ -1,6 +1,5 @@
-#include "global.h"
-#include "joypad.h"
 #include "ekans.h"
+#include "joypad.h"
 #define LOGO_WIDTH 192
 #define LOGO_HEIGHT 192
 #define MAIN_MENU_WIDTH (12 * 16) // longest option + cursor
@@ -34,7 +33,13 @@ void Ekans_MainMenu(void){
 		case 0:
 			gEkansState = DIFFICULTY;
 			break;
+		case 1:
+			gRenderFunc = Render_FadeTransition;
+			gRenderFuncAfterFade = Ekans_RenderFunc;
+			gEkansState = HIGHSCORES;
+			break;
 		case 2:
+			Ekans_StopFunc();
 			GameExit();
 			break;
 		}

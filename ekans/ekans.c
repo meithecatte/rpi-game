@@ -1,7 +1,5 @@
-#include "global.h"
-#include "helper.h"
-#include "joypad.h"
 #include "ekans.h"
+#include "joypad.h"
 #include <string.h>
 
 const int gEkansFramesPerUpdate[] = {
@@ -19,9 +17,10 @@ const int gEkansScoreMultiplier[] = {
 };
 
 void Ekans_StartFunc(void){
-	for(int i = 0;i < LENGTH(gEkansHighScores);i++){
-		strcpy(gEkansHighScores[i].name, "");
-		gEkansHighScores[i].score = 0;
+	for(int i = 0;i < EKANS_NUM_HIGHSCORES;i++){
+		strcpy(gEkansHighscores[i].name, "TEST000");
+		gEkansHighscores[i].name[6] = '0' + i;
+		gEkansHighscores[i].score = 150 - i * 12;
 	}
 
 	gEkansDifficulty = NORMAL;
@@ -29,21 +28,31 @@ void Ekans_StartFunc(void){
 	gEkansHead = NULL;
 	gEkansTail = NULL;
 	gEkansMenuCursorLocation = 0;
-	gEkansVHighScore = gEkansHighScores[0].score;
+	gEkansVHighScore = gEkansHighscores[0].score;
+	gEkansTempTexture = SDL_CreateTexture(gRenderer,
+		SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET,
+		SCREEN_WIDTH, SCREEN_HEIGHT);
+	ERROR_ON_SDL(!gEkansTempTexture, "SDL_CreateTexture")
 }
 
 void Ekans_RenderFunc(void){
-	SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-	SDL_RenderClear(gRenderer);
-
 	switch(gEkansState){
 	case MAIN_MENU:
+		SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+		SDL_RenderClear(gRenderer);
+
 		Ekans_MainMenu();
 		break;
 	case DIFFICULTY:
+		SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+		SDL_RenderClear(gRenderer);
+
 		Ekans_DifficultyMenu();
 		break;
 	case PLAYING:
+		SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+		SDL_RenderClear(gRenderer);
+
 		Ekans_ProcessInput();
 
 		if(gEkansFramesSinceLastUpdate
@@ -57,10 +66,37 @@ void Ekans_RenderFunc(void){
 		Ekans_RenderPlayfield();
 		break;
 	case GAME_OVER:
-		gEkansState = MAIN_MENU;
+		Ekans_GameOverScreen();
+		break;
+	case HIGHSCORES:
+		if(!gScreenFade){
+			SDL_SetRenderTarget(gRenderer, gEkansTempTexture);
+			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+			SDL_RenderClear(gRenderer);
+			Ekans_RenderHighscores("High Scores", false);
+			SDL_SetRenderTarget(gRenderer, gScreen);
+			SDL_SetTextureColorMod(gEkansTempTexture,
+				255, 255, 255);
+		}
+
+		SDL_RenderCopy(gRenderer, gEkansTempTexture, NULL, NULL);
+		
+		if(!gScreenFade) break;
+
+		if(gJoypadPressed & (JOY_A | JOY_B)){
+			gRenderFunc = Render_FadeTransition;
+			gRenderFuncAfterFade = Ekans_RenderFunc;
+			gEkansState = MAIN_MENU;
+		}
+
+		break;
 	default:
 		break;
 	}
+}
+
+void Ekans_StopFunc(void){
+	SDL_DestroyTexture(gEkansTempTexture);
 }
 
 void Ekans_StartGame(void){
@@ -123,10 +159,7 @@ void Ekans_LogicUpdate(void){
 		Ekans_AddSegment(newHeadX, newHeadY);
 		Ekans_RandomizeFruitLocation();
 	}else{
-		if(Ekans_IsOccupied(newHeadX, newHeadY)){
-			// XXX: Check for highscore
-			gEkansState = GAME_OVER;
-		}
+		bool gameOver = Ekans_IsOccupied(newHeadX, newHeadY);
 
 		Ekans_Segment * newHead = gEkansTail;
 		newHead->x = newHeadX;
@@ -138,6 +171,8 @@ void Ekans_LogicUpdate(void){
 		newHead->prev = NULL;
 		newHead->next = gEkansHead;
 		gEkansHead = newHead;
+
+		if(gameOver) Ekans_GameOver();
 	}
 }
 

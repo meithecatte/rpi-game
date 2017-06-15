@@ -1,5 +1,4 @@
 #include "global.h"
-#include "helper.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #define FADE_SPEED 16
