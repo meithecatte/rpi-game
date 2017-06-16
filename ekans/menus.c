@@ -47,17 +47,10 @@ void Ekans_MainMenu(void){
 }
 
 void Ekans_DifficultyMenu(void){
-	SDL_Rect dstrect;
-	dstrect.x = (SCREEN_WIDTH - LOGO_WIDTH) / 2; // logo
-	dstrect.y = 0;
-	dstrect.w = LOGO_WIDTH;
-	dstrect.h = LOGO_HEIGHT;
-	SDL_RenderCopy(gRenderer, gGames[GAME_EKANS].menuIcon,
-		NULL, &dstrect);
-
 	const int menuX = (SCREEN_WIDTH - DIFFICULTY_MENU_WIDTH) / 2;
 	const int menuY = LOGO_HEIGHT - 8 + 40;
 
+	Ekans_DrawLogo();
 	SetFontColor8(0, 0, 0);
 	SetFontColor16(0, 0, 0);
 	RenderText16s((SCREEN_WIDTH - 17 * 16) / 2, menuY - 40, 2,
@@ -92,6 +85,6 @@ void Ekans_DrawLogo(void){
 	dstrect.y = 0;
 	dstrect.w = LOGO_WIDTH;
 	dstrect.h = LOGO_HEIGHT;
-	SDL_RenderCopy(gRenderer, gGames[GAME_EKANS].menuIcon,
+	SDL_RenderCopy(gRenderer, gEkansIngameLogo,
 		NULL, &dstrect);
 }

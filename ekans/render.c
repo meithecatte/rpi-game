@@ -4,25 +4,24 @@
 void Ekans_RenderPlayfield(void){
 	Ekans_RenderWalls();
 	Ekans_RenderScore();
-	SDL_Rect dstrect;
+	SDL_Rect srcrect, dstrect;
 	dstrect.w = 16;
 	dstrect.h = 16;
-
-	SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
 	dstrect.x = gEkansFruitX * 16;
 	dstrect.y = gEkansFruitY * 16;
-	SDL_RenderFillRect(gRenderer, &dstrect);
-	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+	SDL_RenderCopy(gRenderer, gEkansFruit, NULL, &dstrect);
+
+	srcrect.w = 16;
+	srcrect.h = 16;
 
 	Ekans_Segment * curr = gEkansTail;
 	while(curr){
-		if(curr == gEkansHead){
-			SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
-		}
-
 		dstrect.x = curr->x * 16;
 		dstrect.y = curr->y * 16;
-		SDL_RenderFillRect(gRenderer, &dstrect);
+		srcrect.x = Ekans_GetSegmentDirection(curr) * 16;
+		srcrect.y = Ekans_GetSegmentType(curr) * 16;
+		SDL_RenderCopy(gRenderer, gEkansSegments,
+			&srcrect, &dstrect);
 		curr = curr->prev;
 	}
 }
@@ -75,4 +74,56 @@ void Ekans_RenderWalls(void){
 	SDL_RenderFillRect(gRenderer, &dstrect);
 	dstrect.x = 0;
 	SDL_RenderFillRect(gRenderer, &dstrect);
+}
+
+ekans_direction_t Ekans_GetSegmentDirection(
+		const Ekans_Segment * segment){
+	if(!segment->prev){
+		return gEkansDirection;
+	}
+
+	int dx = (segment->prev->x - segment->x);
+	int dy = (segment->prev->y - segment->y);
+
+	if(dx < -1) dx += EKANS_PLAYFIELD_WIDTH;
+	if(dx > 1) dx -= EKANS_PLAYFIELD_WIDTH;
+	if(dy < -1) dy += EKANS_PLAYFIELD_HEIGHT;
+	if(dy > 1) dy -= EKANS_PLAYFIELD_HEIGHT;
+
+	if(dx == 1) return RIGHT;
+	if(dx == -1) return LEFT;
+	if(dy == 1) return DOWN;
+	if(dy == -1) return UP;
+	
+	fprintf(stderr, "Ekans_GetSegmentDirection: noreach?\n");
+	exit(1);
+}
+
+ekans_segment_type_t Ekans_GetSegmentType(
+		const Ekans_Segment * segment){
+	if(!segment->prev){
+		return HEAD;
+	}
+
+	if(!segment->next){
+		return TAIL;
+	}
+
+	ekans_direction_t dir, dirNext;
+	dir = Ekans_GetSegmentDirection(segment);
+	dirNext = Ekans_GetSegmentDirection(segment->next);
+
+	if(dir == dirNext){
+		return STRAIGHT;
+	}
+
+	switch(dir){
+	case UP:    return (dirNext == RIGHT) ? LEFTTURN : RIGHTTURN;
+	case DOWN:  return (dirNext == LEFT)  ? LEFTTURN : RIGHTTURN;
+	case LEFT:  return (dirNext == UP)    ? LEFTTURN : RIGHTTURN;
+	case RIGHT: return (dirNext == DOWN)  ? LEFTTURN : RIGHTTURN;
+	default:
+		fprintf(stderr, "Ekans_GetSegmentType: no direction?\n");
+		exit(1);
+	}
 }

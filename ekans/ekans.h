@@ -51,15 +51,20 @@ void Ekans_StartFunc(void);
 void Ekans_RenderFunc(void);
 void Ekans_StopFunc(void);
 void Ekans_StartGame(void);
-void Ekans_RenderPlayfield(void);
-void Ekans_RenderScore(void);
-void Ekans_RenderWalls(void);
 void Ekans_LogicUpdate(void);
 void Ekans_ProcessInput(void);
 void Ekans_AddSegment(int x, int y);
-bool Ekans_IsOccupied(int x, int y);
+Ekans_Segment * Ekans_IsOccupied(int x, int y);
 bool Ekans_IsWall(int x, int y);
 void Ekans_RandomizeFruitLocation(void);
+
+void Ekans_RenderPlayfield(void);
+void Ekans_RenderScore(void);
+void Ekans_RenderWalls(void);
+ekans_direction_t Ekans_GetSegmentDirection(
+	const Ekans_Segment * segment);
+ekans_segment_type_t Ekans_GetSegmentType(
+	const Ekans_Segment * segment);
 
 void Ekans_MainMenu(void);
 void Ekans_DifficultyMenu(void);
