@@ -37,6 +37,8 @@ void Ekans_StartFunc(void){
 
 	strcpy(gEkansScoreName, "A");
 
+	Ekans_LoadHighscores();
+
 	gEkansDifficulty = NORMAL;
 	gEkansState = MAIN_MENU;
 	gEkansHead = NULL;
@@ -170,6 +172,11 @@ void Ekans_LogicUpdate(void){
 		gEkansScore += 3 * gEkansLength
 			* gEkansScoreMultiplier[gEkansDifficulty];
 		gEkansScore += rand() % 9 + 1;
+
+		if(gEkansScore > 999999 || gEkansScore < 0){
+			gEkansScore = 999999;
+		}
+
 		Ekans_AddSegment(newHeadX, newHeadY);
 		Ekans_RandomizeFruitLocation();
 	}else{

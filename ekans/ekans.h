@@ -4,6 +4,7 @@
 #define EKANS_PLAYFIELD_HEIGHT 28
 #define EKANS_SCORE_NAME_LENGTH 7
 #define EKANS_NUM_SCORES 10
+#define EKANS_SAVEDATA_SIZE 128
 #include "global.h"
 
 typedef enum { SLOW, NORMAL, FAST, INSANE } ekans_difficulty_t;

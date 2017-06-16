@@ -1,6 +1,8 @@
 #include "ekans.h"
 #include "joypad.h"
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 int gEkansGameOverFade, gEkansScoreIndex;
 int gEkansNameEntryBlinkCounter;
@@ -150,6 +152,8 @@ void Ekans_FinishNameEntry(void){
 	SDL_SetRenderTarget(gRenderer, gScreen);
 	SDL_SetTextureColorMod(gScreen, 255, 255, 255);
 	SDL_RenderCopy(gRenderer, gEkansTempTexture, NULL, NULL);
+
+	Ekans_SaveHighscores();
 }
 
 void Ekans_RenderHighscores(char * header, char * subHeader){
@@ -173,4 +177,48 @@ void Ekans_RenderHighscores(char * header, char * subHeader){
 		RenderText8s((SCREEN_WIDTH - 15 * 16) / 2, 86 + i * 20, 2,
 			buffer);
 	}
+}
+
+void Ekans_LoadHighscores(void){
+	int fd = open(STORAGE_PATH "ekans", O_RDONLY);
+	if(fd < 0)
+		return;
+
+	char data[EKANS_SAVEDATA_SIZE];
+
+	if(read(fd, data, EKANS_SAVEDATA_SIZE) != EKANS_SAVEDATA_SIZE){
+		close(fd);
+		return;
+	}
+	
+	close(fd);
+	
+	for(int i = 0;i < EKANS_NUM_SCORES;i++){
+		strcpy(gEkansHighscores[i].name, &data[12 * i]);
+		memcpy(&gEkansHighscores[i].score,
+			&data[12 * i + EKANS_SCORE_NAME_LENGTH + 1],
+			sizeof(int));
+	}
+
+	strcpy(gEkansScoreName, &data[12 * EKANS_NUM_SCORES]);
+}
+
+void Ekans_SaveHighscores(void){
+	char data[EKANS_SAVEDATA_SIZE];
+	memset(data, 0, EKANS_SAVEDATA_SIZE);
+
+	for(int i = 0;i < EKANS_NUM_SCORES;i++){
+		strcpy(&data[12 * i], gEkansHighscores[i].name);
+		memcpy(&data[12 * i + EKANS_SCORE_NAME_LENGTH + 1],
+			&gEkansHighscores[i].score, sizeof(int));
+	}
+
+	strcpy(&data[12 * EKANS_NUM_SCORES], gEkansScoreName);
+
+	int fd = creat(STORAGE_PATH "ekans", 0777);
+	if(fd < 0)
+		return;
+	
+	write(fd, data, EKANS_SAVEDATA_SIZE);
+	close(fd);
 }
