@@ -180,8 +180,6 @@ void Ekans_LogicUpdate(void){
 		Ekans_AddSegment(newHeadX, newHeadY);
 		Ekans_RandomizeFruitLocation();
 	}else{
-		bool gameOver = Ekans_IsOccupied(newHeadX, newHeadY);
-
 		Ekans_Segment * newHead = gEkansTail;
 		newHead->x = newHeadX;
 		newHead->y = newHeadY;
@@ -193,7 +191,8 @@ void Ekans_LogicUpdate(void){
 		newHead->next = gEkansHead;
 		gEkansHead = newHead;
 
-		if(gameOver) Ekans_GameOver();
+		Ekans_Segment * seg = Ekans_IsOccupied(newHeadX, newHeadY);
+		if(seg && seg != gEkansHead) Ekans_GameOver();
 	}
 }
 
@@ -237,20 +236,24 @@ void Ekans_AddSegment(int x, int y){
 	gEkansLength++;
 }
 
-bool Ekans_IsOccupied(int x, int y){
-	Ekans_Segment * curr = gEkansHead;
+Ekans_Segment * Ekans_IsOccupied(int x, int y){
+	Ekans_Segment * curr = gEkansTail;
 
-	if(Ekans_IsWall(x, y)) return true;
+	if(Ekans_IsWall(x, y)){
+		// return a pointer to Ekans_IsOccupied, and therefore
+		// definitely not a segment
+		return (Ekans_Segment *) Ekans_IsOccupied;
+	}
 
 	while(curr){
 		if(curr->x == x && curr->y == y){
-			return true;
+			return curr;
 		}
 
-		curr = curr->next;
+		curr = curr->prev;
 	}
 
-	return false;
+	return NULL;
 }
 
 bool Ekans_IsWall(int x, int y){
