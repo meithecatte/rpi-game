@@ -11,6 +11,8 @@ typedef enum { SLOW, NORMAL, FAST, INSANE } ekans_difficulty_t;
 typedef enum { UP, DOWN, LEFT, RIGHT, NONE } ekans_direction_t;
 typedef enum { MAIN_MENU, DIFFICULTY, PLAYING, PAUSED, GAME_OVER,
 	HIGHSCORES } ekans_state_t;
+typedef enum { HEAD, TAIL, STRAIGHT, LEFTTURN,
+	RIGHTTURN } ekans_segment_type_t;
 
 typedef struct __Ekans_Segment {
 	struct __Ekans_Segment * prev; // NULL if head
