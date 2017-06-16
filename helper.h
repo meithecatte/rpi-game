@@ -35,7 +35,7 @@
 
 #define _malloc(size) _safe_malloc(size, __FILE__ ":" STR(__LINE__) ": out of memory")
 
-typedef enum { KEY_NONE, KEY_BLACK } color_key_index_t;
+typedef enum { KEY_NONE, KEY_BLACK, KEY_WHITE } color_key_index_t;
 
 extern render_func_t gRenderFuncAfterFade;
 extern int gMallocCount;

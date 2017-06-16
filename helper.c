@@ -6,7 +6,8 @@
 render_func_t gRenderFuncAfterFade = NULL;
 int gMallocCount;
 
-SDL_Texture * Load_Texture(const char * path, color_key_index_t key){
+SDL_Texture * Load_Texture(const char * path,
+		color_key_index_t key){
 	printf("Loading %s\n", path);
 
 	SDL_Surface * surface = IMG_Load(path);
@@ -16,11 +17,17 @@ SDL_Texture * Load_Texture(const char * path, color_key_index_t key){
 	case KEY_NONE:
 		break;
 	case KEY_BLACK:
-		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0, 0));
+		SDL_SetColorKey(surface, SDL_TRUE,
+			SDL_MapRGB(surface->format, 0, 0, 0));
+		break;
+	case KEY_WHITE:
+		SDL_SetColorKey(surface, SDL_TRUE,
+			SDL_MapRGB(surface->format, 255, 255, 255));
 		break;
 	}
 
-	SDL_Texture * texture = SDL_CreateTextureFromSurface(gRenderer, surface);
+	SDL_Texture * texture =
+		SDL_CreateTextureFromSurface(gRenderer, surface);
 	ERROR_ON_SDL(texture == NULL, "SDL_CreateTextureFromSurface");
 
 	SDL_FreeSurface(surface);
