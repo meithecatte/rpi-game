@@ -13,6 +13,7 @@ for configuring SDL~~, also uses `SDL_image` and `SDL_mixer`
  * Code in `gamename/*`
  * `startFunc` is called once, then `renderFunc` every frame
  * to exit, cleanup everything and call `GameExit`
+ * define your images in `IMAGE_LIST` in `global.h`
 
 ## Save format used by games
 
