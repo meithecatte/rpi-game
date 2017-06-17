@@ -20,7 +20,7 @@ SDL_Window * gWindow = NULL;
 SDL_Renderer * gRenderer = NULL;
 SDL_Texture * gScreen = NULL;
 
-render_func_t gRenderFunc = NULL;
+void_func_t gRenderFunc = NULL;
 
 bool gExit;
 uint8_t gScreenFade = 255;

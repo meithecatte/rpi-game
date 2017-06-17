@@ -21,6 +21,9 @@ ekans_direction_t gEkansDirection;
 ekans_difficulty_t gEkansDifficulty;
 ekans_state_t gEkansState;
 
+Mix_Music* gEkansIngameMusic;
+Mix_Music* gEkansTitlescreenMusic;
+
 int gEkansLength, gEkansScore, gEkansVScore, gEkansVHighScore;
 int gEkansFruitX, gEkansFruitY, gEkansMenuCursorLocation;
 int gEkansFramesSinceLastUpdate;
@@ -30,6 +33,9 @@ Ekans_Segment * gEkansTail;
 Ekans_ScoresTableEntry gEkansHighscores[EKANS_NUM_SCORES];
 
 void Ekans_StartFunc(void){
+	gEkansIngameMusic = Load_Music("assets/ekans/ingame.wav");
+	gEkansTitlescreenMusic =
+		Load_Music("assets/ekans/titlescreen.wav");
 	for(int i = 0;i < EKANS_NUM_SCORES;i++){
 		strcpy(gEkansHighscores[i].name, "");
 		gEkansHighscores[i].score = 0;
@@ -85,21 +91,11 @@ void Ekans_RenderFunc(void){
 		Ekans_GameOverScreen();
 		break;
 	case HIGHSCORES:
-		if(!gScreenFade){
-			SDL_SetRenderTarget(gRenderer, gEkansTempTexture);
-			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
-			SDL_RenderClear(gRenderer);
-			Ekans_RenderHighscores("High Scores", NULL);
-			SDL_SetRenderTarget(gRenderer, gScreen);
-			SDL_SetTextureColorMod(gEkansTempTexture,
-				255, 255, 255);
-		}
-
 		SDL_RenderCopy(gRenderer, gEkansTempTexture, NULL, NULL);
 		
 		if(!gScreenFade) break;
 
-		if(gJoypadPressed & (JOY_A | JOY_B)){
+		if(gJoypadPressed & (JOY_A | JOY_B | JOY_START)){
 			gRenderFunc = Render_FadeTransition;
 			gRenderFuncAfterFade = Ekans_RenderFunc;
 			gEkansState = MAIN_MENU;
@@ -112,7 +108,10 @@ void Ekans_RenderFunc(void){
 }
 
 void Ekans_StopFunc(void){
+	Mix_FreeMusic(gEkansIngameMusic);
+	Mix_FreeMusic(gEkansTitlescreenMusic);
 	SDL_DestroyTexture(gEkansTempTexture);
+	GameExit();
 }
 
 void Ekans_StartGame(void){

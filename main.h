@@ -5,7 +5,7 @@
 extern SDL_Renderer * gRenderer;
 extern SDL_Texture * gScreen;
 extern uint8_t gScreenFade;
-extern render_func_t gRenderFunc;
+extern void_func_t gRenderFunc;
 
 #define X(var,path,key) extern SDL_Texture * var;
 IMAGE_LIST

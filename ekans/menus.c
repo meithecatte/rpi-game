@@ -37,10 +37,16 @@ void Ekans_MainMenu(void){
 			gRenderFunc = Render_FadeTransition;
 			gRenderFuncAfterFade = Ekans_RenderFunc;
 			gEkansState = HIGHSCORES;
+			SDL_SetRenderTarget(gRenderer, gEkansTempTexture);
+			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 255);
+			SDL_RenderClear(gRenderer);
+			Ekans_RenderHighscores("High Scores", NULL);
+			SDL_SetRenderTarget(gRenderer, gScreen);
+			SDL_SetTextureColorMod(gEkansTempTexture,
+				255, 255, 255);
 			break;
 		case 2:
 			Ekans_StopFunc();
-			GameExit();
 			break;
 		}
 	}

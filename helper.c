@@ -1,9 +1,10 @@
 #include "global.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #define FADE_SPEED 16
 
-render_func_t gRenderFuncAfterFade = NULL;
+void_func_t gRenderFuncAfterFade = NULL;
 int gMallocCount;
 
 SDL_Texture * Load_Texture(const char * path,
@@ -33,6 +34,13 @@ SDL_Texture * Load_Texture(const char * path,
 	SDL_FreeSurface(surface);
 
 	return texture;
+}
+
+Mix_Music* Load_Music(const char* path){
+	printf("Loading %s\n", path);
+	Mix_Music* music = Mix_LoadMUS(path);
+	ERROR_ON_MIX(!music, "Mix_LoadMUS");
+	return music;
 }
 
 void * _safe_malloc(size_t size, char * error){

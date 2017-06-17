@@ -43,6 +43,8 @@ extern int gEkansNameEntryBlinkCounter;
 extern char gEkansScoreName[EKANS_SCORE_NAME_LENGTH + 1];
 extern bool gEkansNameEntryFinished;
 extern SDL_Texture * gEkansTempTexture;
+extern Mix_Music * gEkansIngameMusic;
+extern Mix_Music * gEkansTitlescreenMusic;
 extern Ekans_Segment * gEkansHead;
 extern Ekans_Segment * gEkansTail;
 extern Ekans_ScoresTableEntry gEkansHighscores[EKANS_NUM_SCORES];
@@ -66,8 +68,15 @@ ekans_direction_t Ekans_GetSegmentDirection(
 ekans_segment_type_t Ekans_GetSegmentType(
 	const Ekans_Segment * segment);
 
+void Ekans_GenericMenu(int menuY, int numEntries,
+	const char** entries, const void_func_t* handlers,
+	void_func_t backHandler);
 void Ekans_MainMenu(void);
+void Ekans_MainMenu_NewGame(void);
+void Ekans_MainMenu_Highscores(void);
 void Ekans_DifficultyMenu(void);
+void Ekans_DifficultyMenu_OK(void);
+void Ekans_DifficultyMenu_Cancel(void);
 void Ekans_DrawLogo(void);
 
 void Ekans_GameOver(void);

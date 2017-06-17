@@ -3,14 +3,13 @@
 #define GAME_COUNT 1
 #include <SDL2/SDL.h>
 
-typedef void (*start_func_t)(void);
-typedef void (*render_func_t)(void);
+typedef void (*void_func_t)(void);
 
 typedef enum { GAME_EKANS, GAME_NONE } game_index_t;
 
 typedef struct {
-	start_func_t startFunction;
-	render_func_t renderFunction;
+	void_func_t startFunction;
+	void_func_t renderFunction;
 	char * menuNameTop;
 	char * menuNameBottom;
 	char * menuIconPath;
