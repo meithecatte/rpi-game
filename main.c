@@ -150,3 +150,11 @@ void Measure_FPS(void){
 	RenderText16(0, 0, str);
 	free(str); // TEST_EXCEPTION - allocated by asprintf
 }
+
+void PowerOff_StartFunc(void){
+	;
+}
+
+void PowerOff_RenderFunc(void){
+	exit(0);
+}

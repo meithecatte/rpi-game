@@ -24,38 +24,88 @@ void Render_SplashScreen(void){
 
 void Render_GameSelectMenu(void){
 	static game_index_t currentGame = GAME_EKANS;
+	static int scroll = 0;
+	static int scrolldir = 0;
+	static int bgscroll = 0;
+
+	SDL_Rect rect;
+	rect.x = bgscroll;
+	rect.y = 0;
+	rect.w = SCREEN_WIDTH;
+	rect.h = SCREEN_HEIGHT;
 	SDL_RenderCopy(gRenderer, gTextureExtendedBackground,
-		NULL, NULL);
+		&rect, NULL);
 	
-	// XXX: Make this support more than one game when needed
-	SDL_Rect dstrect;
-	dstrect.x = (SCREEN_WIDTH - MENU_GAME_WIDTH * 2) / 2;
-	dstrect.y = (SCREEN_HEIGHT - MENU_GAME_HEIGHT * 2) / 2;
-	dstrect.w = MENU_GAME_WIDTH * 2;
-	dstrect.h = MENU_GAME_HEIGHT * 2;
-	SDL_RenderCopy(gRenderer, gGames[0].menuRendered,
-		NULL, &dstrect);
+	int baseX = (SCREEN_WIDTH - MENU_GAME_WIDTH * 2) / 2 + scroll;
+
+	rect.x = baseX;
+	rect.y = (SCREEN_HEIGHT - MENU_GAME_HEIGHT * 2) / 2;
+	rect.w = MENU_GAME_WIDTH * 2;
+	rect.h = MENU_GAME_HEIGHT * 2;
+	SDL_RenderCopy(gRenderer,
+		gGames[currentGame].menuRendered, NULL, &rect);
+
+	if(currentGame > 0){
+		rect.x = baseX - 288;
+		SDL_RenderCopy(gRenderer,
+			gGames[currentGame - 1].menuRendered, NULL, &rect);
+	}
+
+	if(currentGame < GAME_COUNT - 1){
+		rect.x = baseX + 288;
+		SDL_RenderCopy(gRenderer,
+			gGames[currentGame + 1].menuRendered, NULL, &rect);
+	}
+
+	scroll += scrolldir * 18;
+	bgscroll -= scrolldir * 3;
+
+	if(bgscroll >= MENU_BACKGROUND_WIDTH){
+		bgscroll -= MENU_BACKGROUND_WIDTH;
+	}
+
+	if(bgscroll < 0){
+		bgscroll += MENU_BACKGROUND_WIDTH;
+	}
+
+	if(abs(scroll) >= 144){
+		scroll *= -1;
+		currentGame -= scrolldir;
+	}
+
+	if(scroll == 0){
+		scroll = 0;
+		scrolldir = 0;
+	}
 
 	if(!gScreenFade) return; // don't check input if mid-fade render
+	if(scrolldir) return; // don't check input if scrolling
 
 	if(gJoypadPressed & (JOY_START | JOY_A)){
 		CALL_UNLESS_NULL(gGames[currentGame].startFunction);
 		gRenderFunc = Render_FadeTransition;
-		gRenderFuncAfterFade = gGames[0].renderFunction;
+		gRenderFuncAfterFade = gGames[currentGame].renderFunction;
+	}else if((gJoypadPressed & (JOY_LEFT | JOY_L)) &&
+			currentGame > 0){
+		scrolldir = 1;
+	}else if((gJoypadPressed & (JOY_RIGHT | JOY_R)) &&
+			currentGame < GAME_COUNT - 1){
+		scrolldir = -1;
 	}
 }
 
 void GameSelectMenu_PrepareBackground(void){
 	gTextureExtendedBackground = SDL_CreateTexture(gRenderer,
 		SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET,
-		SCREEN_WIDTH, SCREEN_HEIGHT);
+		SCREEN_WIDTH + MENU_BACKGROUND_WIDTH,
+		SCREEN_HEIGHT + MENU_BACKGROUND_HEIGHT);
 	ERROR_ON_SDL(!gTextureExtendedBackground, "bg texture");
 	SDL_SetRenderTarget(gRenderer, gTextureExtendedBackground);
 	SDL_Rect dstrect;
 	dstrect.w = MENU_BACKGROUND_WIDTH;
 	dstrect.h = MENU_BACKGROUND_HEIGHT;
-	for(int y = 0;y < SCREEN_HEIGHT;y += MENU_BACKGROUND_HEIGHT){
-		for(int x = 0;x < SCREEN_WIDTH;x += MENU_BACKGROUND_WIDTH){
+	for(int y = 0;y <= SCREEN_HEIGHT;y += MENU_BACKGROUND_HEIGHT){
+		for(int x = 0;x <= SCREEN_WIDTH;x += MENU_BACKGROUND_WIDTH){
 			dstrect.x = x;
 			dstrect.y = y;
 			SDL_RenderCopy(gRenderer, gTextureMenuBackground,

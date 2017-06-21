@@ -17,4 +17,6 @@ void Init_Random(void);
 void Init_SDL(void);
 void Init_FPS(void);
 void Measure_FPS(void);
+void PowerOff_StartFunc(void);
+void PowerOff_RenderFunc(void);
 #endif
