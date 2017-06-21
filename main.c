@@ -98,8 +98,8 @@ void Init_SDL(void){
 		"SDL_Init"); atexit(SDL_Quit);
 	ERROR_ON_IMG(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG),
 		"IMG_Init"); atexit(IMG_Quit);
-	ERROR_ON_MIX(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT,
-		1, 1024) < 0, "Mix_OpenAudio"); atexit(Mix_Quit);
+	ERROR_ON_MIX(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT,
+		2, 2048) < 0, "Mix_OpenAudio"); atexit(Mix_Quit);
 	atexit(Dealloc_Resources);
 
 	gWindow = SDL_CreateWindow("rpi-game", SDL_WINDOWPOS_UNDEFINED,

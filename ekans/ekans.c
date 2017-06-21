@@ -55,6 +55,8 @@ void Ekans_StartFunc(void){
 		SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET,
 		SCREEN_WIDTH, SCREEN_HEIGHT);
 	ERROR_ON_SDL(!gEkansTempTexture, "SDL_CreateTexture")
+
+	Mix_PlayMusic(gEkansTitlescreenMusic, -1);
 }
 
 void Ekans_RenderFunc(void){
@@ -134,6 +136,8 @@ void Ekans_StartGame(void){
 	Ekans_AddSegment(16, 14);
 	Ekans_AddSegment(15, 14);
 	Ekans_RandomizeFruitLocation();
+
+	Mix_PlayMusic(gEkansIngameMusic, -1);
 }
 
 void Ekans_LogicUpdate(void){

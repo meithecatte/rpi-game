@@ -11,6 +11,7 @@ char gEkansScoreName[EKANS_SCORE_NAME_LENGTH + 1];
 bool gEkansNameEntryFinished;
 
 void Ekans_GameOver(void){
+	Mix_PlayMusic(gEkansTitlescreenMusic, -1);
 	gEkansState = GAME_OVER;
 	gEkansVScore = gEkansScore;
 	gEkansGameOverFade = 255;
