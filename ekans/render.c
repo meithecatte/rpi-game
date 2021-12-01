@@ -42,7 +42,7 @@ void Ekans_RenderScore(void){
 		gEkansVHighScore = gEkansVScore;
 	}
 
-	char buffer[39];
+	char buffer[40];
 	sprintf(buffer, "Score: %06d        High Score: %06d",
 		gEkansVScore, gEkansVHighScore);
 	RenderText8s(8, SCREEN_HEIGHT - 24, 2, buffer);

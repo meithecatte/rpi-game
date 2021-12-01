@@ -46,7 +46,7 @@ SDL_Texture* Load_Texture(const char* path, color_key_index_t key);
 Mix_Music* Load_Music(const char* path);
 // do not use _safe_malloc
 // use the _malloc macro instead
-void* _safe_malloc(size_t size, char* error);
+void* _safe_malloc(size_t size, const char* error);
 void _free(void* ptr);
 void RenderChar(int x, int y, int scale, char c, int height);
 void RenderText(int x, int y, int scale, const char* s, int height);

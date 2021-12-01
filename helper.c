@@ -43,11 +43,11 @@ Mix_Music* Load_Music(const char* path){
 	return music;
 }
 
-void * _safe_malloc(size_t size, char * error){
+void * _safe_malloc(size_t size, const char * error){
 	void * ptr = malloc(size); // TEST_EXCEPTION
 
 	if(ptr == NULL){
-		fprintf(stderr, error);
+		fprintf(stderr, "%s\n", error);
 		exit(1);
 	}
 
