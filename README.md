@@ -1,8 +1,7 @@
 # rpi-game
 
-~~Used
-    ../configure --disable-pulseaudio --disable-esd --disable-video-mir --disable-video-wayland --disable-video-x11 --disable-video-opengl --disable-joystick --disable-haptic --enable static
-for configuring SDL~~, also uses `SDL_image` and `SDL_mixer`
+Turns a Raspberry Pi into a gaming platform. A simple snake game is implemented.
+Makes use of a SNES controller connected over GPIO.
 
 ## Adding a new game
 
